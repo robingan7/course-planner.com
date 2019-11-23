@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import "../App.css";
+import "../../App.css";
 import axios from "axios";
 
 export default class Settings extends PureComponent {

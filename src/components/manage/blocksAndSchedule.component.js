@@ -75,7 +75,7 @@ export default function BlocksAndSche() {
   };
 
   return (
-    <div>
+    <div className="blocksSche">
       <FormControl className={classes.formControl}>
         <InputLabel id="demo-mutiple-checkbox-label">Blocks</InputLabel>
         <Select
