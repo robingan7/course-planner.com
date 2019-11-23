@@ -1,0 +1,481 @@
+a{
+    margin:0;
+    transition:0.2s;
+}
+input.hamburger {
+  display: none;
+}
+input.hamburger:checked ~ label > i {
+  background-color: transparent;
+  -webkit-transform: rotate(90deg);
+          transform: rotate(90deg);
+}
+input.hamburger:checked ~ label > i:before {
+  -webkit-transform: translate(-50%, 0%) rotate(45deg);
+          transform: translate(-50%, 0%) rotate(45deg);
+}
+input.hamburger:checked ~ label > i:after {
+  -webkit-transform: translate(-50%, 0%) rotate(-45deg);
+          transform: translate(-50%, 0%) rotate(-45deg);
+}
+input.hamburger:checked ~ label > div::after {
+  width: 100%;
+}
+input.hamburger:checked ~ label > div::before {
+  width: 0;
+}
+
+label.hamburger {
+  z-index: 9999;
+  position: relative;
+  display: block;
+  height: 50px;
+  width: 50px;
+}
+
+label.hamburger:hover {
+  cursor: pointer;
+}
+label.hamburger > div {
+  font-size: .8em;
+}
+label.hamburger > div::after, label.hamburger > div::before {
+  top: 100%;
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  overflow: hidden;
+  transition: width .25s .35s, color .45s .35s;
+}
+label.hamburger > div::after {
+  content: '';
+  right: 0;
+  width: 0;
+}
+label.hamburger > div::before {
+  content: '';
+  left: 0;
+}
+label.hamburger > i {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  top: 50%;
+  background-color: #222;
+  pointer-events: auto;
+  transition-duration: .35s;
+  transition-delay: .35s;
+}
+label.hamburger > i:before, label.hamburger > i:after {
+  position: absolute;
+  border-radius: 2px;
+  display: block;
+  width: 100%;
+  height: 2px;
+  left: 50%;
+  background-color: #222;
+  content: "";
+  transition: -webkit-transform 0.35s;
+  transition: transform 0.35s;
+  transition: transform 0.35s, -webkit-transform 0.35s;
+  -webkit-transform-origin: 50% 50%;
+          transform-origin: 50% 50%;
+}
+label.hamburger > i:before {
+  -webkit-transform: translate(-50%, -14px);
+          transform: translate(-50%, -14px);
+}
+label.hamburger > i:after {
+  -webkit-transform: translate(-50%, 14px);
+          transform: translate(-50%, 14px);
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.primnav li:hover, .primnav expand:hover {
+  background-color: rgba(148, 160, 171, 0.5);
+}
+
+.primnav {
+  position: fixed;
+  height: 58px;
+  width: 100vw;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  background-color: var(--primary);;
+  display: flex;
+  flex-direction: column;
+  transition: height 246ms 0.2s ease;
+  padding-top: 58px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  box-sizing: border-box;
+  z-index: 9;
+}
+@media (min-width: 650px) {
+  .primnav {
+    height: 100vh;
+    width: 58px;
+    transition: width 246ms 0.2s ease;
+  }
+}
+.primnav > ul {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.primnav li {
+  position: relative;
+}
+.primnav li .tag {
+  background-color: var(--primary);;
+  color: rgba(255, 255, 255, 0.8);
+  color: #e6e6e6;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0 0.5em;
+  border-radius: 2em;
+  margin-left: auto;
+  margin-right: 0.75em;
+}
+.primnav li a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  color: white;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+}
+.primnav .icon {
+  height: 20px;
+  flex-shrink: 0;
+  width: 20px;
+  padding: 19px;
+  margin-right: 5px;
+  padding-bottom: 15px;  
+  color: rgba(255, 255, 255, 0.9);
+  font-size:25px;
+}
+
+.secnav {
+  margin-left: 63px;
+  border-left: 1px solid black;
+  border-left-color: var(--primary);;
+  overflow: hidden;
+}
+.secnav li {
+  color: #e6e6e6;
+  color: rgba(255, 255, 255, 0.9);
+  max-height: 100px;
+  transition: max-height 0.1s;
+}
+@media (min-width: 650px) {
+  .secnav li {
+    max-height: 0px;
+    transition: max-height 0.2s 0.2s;
+  }
+}
+.secnav li a {
+  text-transform: initial;
+  display: block;
+  color: inherit;
+  padding: 0.75em 10px;
+}
+.signout{
+    cursor: pointer;
+}
+.userReplace {
+    position: fixed;
+    top:0;
+    right: 0;
+    color: white;
+    background: var(--primary);
+    padding: 2.5px 0;
+    padding-right:5px;
+    z-index:10;
+}
+
+@media (min-width: 650px) {
+  .userReplace {
+      top:10px;
+      right: 10px;
+      border-radius: 10px;
+      box-shadow: 0 14px 28px
+      rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+      padding: 5px 0;
+      padding-right:5px;
+  }
+}
+.userReplace > section {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}
+.userReplace > section > section {
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+}
+.userReplace img {
+  height: 51px;
+  width: 48px;
+  -webkit-clip-path: circle(50% at 50% 50%);
+          clip-path: circle(50% at 50% 50%);
+  margin-left: 10px;
+  min-height: 51px;
+  min-width: 48px;
+  align-items: flex-end;
+}
+.userReplace .nameReplace {
+  text-align: center;
+}
+.userReplace .actionsReplace {
+  font-size: 0.8em;
+  display: flex;
+  justify-content: flex-end;
+}
+.userReplace .actionsReplace a {
+  padding: 0 0.5em;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+}
+
+.userReplace .actionsReplace a:hover{
+    text-decoration: underline;
+}
+.userReplace .actionsReplace a:last-child {
+  padding-right: 0;
+}
+
+content {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 8vw;
+  letter-spacing: 1px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--primary);;
+  height: 100%;
+  padding-top: 58px;
+  box-sizing: border-box;
+  position: relative;
+}
+@media (min-width: 650px) {
+  content {
+    padding-left: 58px;
+    padding-top: 0;
+  }
+}
+
+.features {
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+.features li {
+  width: 100%;
+  text-align: center;
+  padding: 0.25em;
+}
+
+.icon {
+  display: inline-block;
+  width: 5vw;
+  height: 4vw;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+
+/** hamburger */
+input.hamburger {
+  display: none;
+}
+input.hamburger:checked ~ nav.primnav {
+  height: 100vh;
+}
+@media (min-width: 650px) {
+  input.hamburger:checked ~ nav.primnav {
+    width: 275px;
+  }
+}
+@media (min-width: 650px) {
+  input.hamburger:checked ~ nav.primnav .secnav > li {
+    max-height: 100px;
+  }
+  input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(1) {
+    transition: max-height 0.2s 0.37s ease-in;
+  }
+  input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(2) {
+    transition: max-height 0.2s 0.39s ease-in;
+  }
+  input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(3) {
+    transition: max-height 0.2s 0.41s ease-in;
+  }
+  input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(4) {
+    transition: max-height 0.2s 0.43s ease-in;
+  }
+  
+}
+input.hamburger:checked ~ label > i {
+  background-color: transparent;
+  -webkit-transform: rotate(90deg);
+          transform: rotate(90deg);
+}
+input.hamburger:checked ~ label > i:before {
+  -webkit-transform: translate(-50%, -50%) rotate(45deg);
+          transform: translate(-50%, -50%) rotate(45deg);
+}
+input.hamburger:checked ~ label > i:after {
+  -webkit-transform: translate(-50%, -50%) rotate(-45deg);
+          transform: translate(-50%, -50%) rotate(-45deg);
+}
+input.hamburger:checked ~ label .closeReplace {
+  color: rgba(255, 255, 255, 0.8);
+  width: 100%;
+}
+input.hamburger:checked ~ label .openReplace {
+  color: rgba(0, 0, 0, 0);
+  width: 0;
+}
+
+label.hamburger {
+  z-index: 9999;
+  position: relative;
+  display: block;
+  height: 24px;
+  width: 24px;
+}
+label.hamburger:hover {
+  cursor: pointer;
+}
+label.hamburger div .closeReplace,
+label.hamburger div .openReplace {
+  text-transform: uppercase;
+  position: absolute;
+  -webkit-transform: translateY(24px);
+          transform: translateY(24px);
+  text-align: center;
+  overflow: hidden;
+  transition: width 0.25s 0.35s, color 0.45s 0.35s;
+  font-size: 0;
+}
+label.hamburger div .closeReplace {
+  color: rgba(255, 255, 255, 0.8);
+  right: 0;
+  width: 0;
+}
+label.hamburger div .openReplace {
+  color: rgba(255, 255, 255, 0.8);
+  width: 100%;
+}
+label.hamburger > i {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  top: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  pointer-events: auto;
+  transition-duration: 0.35s;
+  transition-delay: 0.35s;
+}
+label.hamburger > i:before, label.hamburger > i:after {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 2px;
+  left: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  content: "";
+  transition: -webkit-transform 0.35s;
+  transition: transform 0.35s;
+  transition: transform 0.35s, -webkit-transform 0.35s;
+  -webkit-transform-origin: 50% 50%;
+          transform-origin: 50% 50%;
+}
+label.hamburger > i:before {
+  -webkit-transform: translate(-50%, -7px);
+          transform: translate(-50%, -7px);
+}
+label.hamburger > i:after {
+  -webkit-transform: translate(-50%, 7px);
+          transform: translate(-50%, 7px);
+}
+
+label.hamburger {
+  position: fixed;
+  top: 14px;
+  left: 17px;
+}
+
+.MuiPaper-root{
+    position: absolute;
+    top:70px;
+    left:10px;
+    height:calc(100% - 90px);
+    border:2px solid black;
+    margin-right:10px;
+}
+
+.regular-container{
+  position: absolute;
+    top:70px;
+    left:10px;
+    height:calc(100% - 90px);
+    margin-right:10px;
+    width:calc(100% - 25px);
+}
+.regular-container form{
+    justify-content: normal;
+}
+@media (min-width: 650px) {
+    .MuiPaper-root{
+        top:85px;
+        left:80px;
+        height:calc(100% - 100px);
+    }
+
+    .regular-container{
+      top:85px;
+      left:80px;
+      width:calc(100% - 100px);
+      height:calc(100% - 100px);
+    }
+
+    .regular-container form input{
+      width:250px;
+    }
+}
+
+.updateImage{
+  margin:10px 0; 
+  width: 120px;
+  -webkit-clip-path: circle(50% at 50% 50%);
+          clip-path: circle(50% at 50% 50%);
+}
+/*not used
+
+input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(5) {
+    transition: max-height 0.2s 0.45s ease-in;
+  }
+  input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(6) {
+    transition: max-height 0.2s 0.47s ease-in;
+  }
+  input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(7) {
+    transition: max-height 0.2s 0.49s ease-in;
+  }
+  input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(8) {
+    transition: max-height 0.2s 0.51s ease-in;
+  }
+  input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(9) {
+    transition: max-height 0.2s 0.53s ease-in;
+  }
+  input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(10) {
+    transition: max-height 0.2s 0.55s ease-in;
+  }
+  */

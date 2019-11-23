@@ -6,8 +6,11 @@ const signupSchema = new Schema(
   {
     username: { type: String, required: true },
     email: { type: String, required: true },
-    password: { type: String, required: true },
-    date: { type: Date, required: true }
+    password: { type: String, required: false },
+    loginType: { type: String, required: true },
+    date: { type: Date, required: true },
+    googleId: { type: String, required: false },
+    imageUrl: { type: String, required: false }
   },
   {
     timestamps: true

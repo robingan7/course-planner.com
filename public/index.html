@@ -6,7 +6,9 @@
  ___/ /  / /___/ / 
 /____/  /_//____/    
 ©甘翔羽 Xiangyu(Robin) Gan | feel free to copy code |@see courseplanner app | Github @robingan7
-@logo deisgn by Alla Afanasenko license https://creativecommons.org/licenses/by/3.0/                                                            
+@logo deisgn by Alla Afanasenko license https://creativecommons.org/licenses/by/3.0/
+@login form design Florin Pop https://codepen.io/FlorinPop17
+@menu design Brady Hullopeter https://codepen.io/bradyhullopeter                                    
 -->
 <html lang="en">
   <head>
@@ -42,3 +44,42 @@
     <div id="root"></div>
   </body>
 </html>
+
+<!--not used
+<script src="https://apis.google.com/js/api:client.js"></script>
+    <script>
+      function attachSignin(element) {
+          console.log(element.id);
+          auth2.attachClickHandler(element, {},
+            function (googleUser) {
+              document.getElementById('login-google').innerText = "Signed in: " +
+                googleUser.getBasicProfile().getName();
+            }, function (error) {
+              alert(JSON.stringify(error, undefined, 2));
+            });
+        }
+
+      var gapiPromise = (function () {
+        return new Promise(function (resolve, reject) {
+          window.onLoadCallback = function () {
+            resolve();
+          };
+        });
+      }());
+      window.app = window.app || {};
+      window.app.gapiPromise = gapiPromise;
+
+      gapiPromise.then(() => {
+        gapi.load("auth2", () => {
+            // Retrieve the singleton for the GoogleAuth library and set up the client.
+            this.auth2 = gapi.auth2.init({
+              client_id: "xxxxxxxxxx.apps.googleusercontent.com",
+              cookiepolicy: "single_host_origin"
+            });
+            this.attachSignin(document.getElementById("login-google"));
+          });
+      });
+
+      console.log(document.getElementById("login-google"));
+    </script>
+-->

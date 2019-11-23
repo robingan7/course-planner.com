@@ -225,6 +225,10 @@ input {
 	margin: 20px 0;
 }
 
+.social-container button{
+	background-color: var(--warning)!important;
+}
+
 .social-container a {
   border: 1px solid #DDDDDD;
   background-color:var(--warning);
@@ -251,6 +255,14 @@ input {
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 	color:#FFFFFF;
+}
+
+.forgetpassword{
+	margin:10px 0;
+}
+
+.forgetpassword:hover{
+	color: var(--primary);
 }
 @media(max-width:500px){
   .App {
