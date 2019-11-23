@@ -5,6 +5,18 @@ a{
 input.hamburger {
   display: none;
 }
+.logoImg{
+  position:fixed;
+  width:45px;
+  left:60px;
+  top:7px;
+  z-index:10;
+}
+@media (min-width: 650px) {
+  .logoImg{
+    width:50px;
+  }
+}
 input.hamburger:checked ~ label > i {
   background-color: transparent;
   -webkit-transform: rotate(90deg);
@@ -457,6 +469,26 @@ label.hamburger {
   width: 120px;
   -webkit-clip-path: circle(50% at 50% 50%);
           clip-path: circle(50% at 50% 50%);
+}
+
+.subTitle{
+  margin:10px 0;
+  border-bottom: 2px solid black;
+}
+
+.MuiButtonGroup-root{
+  margin-left:10px;
+}
+
+.manageContent{
+  width:450px;
+  margin: 0 auto;
+}
+
+@media(max-width:450px){
+  .manageContent{
+    width:100%;
+  }
 }
 /*not used
 
