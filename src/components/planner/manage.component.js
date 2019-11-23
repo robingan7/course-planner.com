@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PlansList from "../manage/plansList.component";
 import BlocksAndSche from "../manage/blocksAndSchedule.component";
 import AddBtn from "../manage/modalButton/addBtn.component";
+import DeleteMutipleBtn from "../manage/modalButton/deleteMutiple.component";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
@@ -27,13 +28,7 @@ export default class Manage extends Component {
                   aria-label="full-width contained primary button group"
                 >
                   <AddBtn />
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<DeleteIcon />}
-                  >
-                    Delete
-                  </Button>
+                  <DeleteMutipleBtn numberOfPlans={0}/>
                 </ButtonGroup>
               </Grid>
               <h2 className="subTitle">Blocks & Textbook</h2>

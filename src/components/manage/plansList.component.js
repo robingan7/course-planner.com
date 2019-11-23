@@ -1,4 +1,6 @@
 import React from "react";
+import EditBtn from './modalButton/editBtn.component'
+import DeleteSingle from "./modalButton/deleteSingle.component";
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -63,12 +65,8 @@ export default function PlansList(props) {
             </ListItemIcon>
             <ListItemText id={labelId} primary={`Unit ${value}`} />
             <ListItemSecondaryAction>
-              <IconButton edge="end" aria-label="comments">
-                <EditIcon />
-              </IconButton>
-              <IconButton edge="end" aria-label="comments">
-                <DeleteIcon />
-              </IconButton>
+              <EditBtn planName={value} />
+              <DeleteSingle planName={value} />
             </ListItemSecondaryAction>
           </ListItem>
         );

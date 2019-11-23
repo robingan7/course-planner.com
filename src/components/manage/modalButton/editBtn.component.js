@@ -1,8 +1,8 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
-import Button from "@material-ui/core/Button";
-import AddIcon from "@material-ui/icons/Add";
+import IconButton from "@material-ui/core/IconButton";
+import EditIcon from "@material-ui/icons/Edit";
 import { useMediaPredicate } from "react-media-hook";
 
 const useStyles = makeStyles(theme => ({
@@ -10,12 +10,13 @@ const useStyles = makeStyles(theme => ({
     position: "absolute",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
-    padding: '10px'
+    padding: "10px"
   }
 }));
 
-export default function AddBtn() {
+export default function EditBtn(props) {
   const classes = useStyles();
+  const planName = props.planName;
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = React.useState(false);
   const isBiggerThan420 = useMediaPredicate("(max-width: 420px)");
@@ -29,16 +30,15 @@ export default function AddBtn() {
   };
 
   return (
-    <div>
-      <Button
+    <React.Fragment>
+      <IconButton
         type="button"
         onClick={handleOpen}
-        variant="contained"
-        color="primary"
-        startIcon={<AddIcon />}
+        edge="end"
+        aria-label="comments"
       >
-        Add
-      </Button>
+        <EditIcon />
+      </IconButton>
       <Modal
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
@@ -49,16 +49,14 @@ export default function AddBtn() {
           style={{
             top: 160,
             left: isBiggerThan420 ? 5 : "calc(50% - 210px)",
-            width: isBiggerThan420? "calc(100% - 30px)" : 400
+            width: isBiggerThan420 ? "calc(100% - 30px)" : 400
           }}
           className={classes.paper}
         >
-          <h2 id="simple-modal-title">Add plans</h2>
-          <p id="simple-modal-description">
-            Add your plans here
-          </p>
+          <h2 id="simple-modal-title">Edit {planName}</h2>
+          <p id="simple-modal-description">Edit {planName}</p>
         </div>
       </Modal>
-    </div>
+    </React.Fragment>
   );
 }

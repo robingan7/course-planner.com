@@ -264,6 +264,10 @@ input {
 .forgetpassword:hover{
 	color: var(--primary);
 }
+
+.makeStyles-paper-204{
+	background-color:red;
+}
 @media(max-width:500px){
   .App {
     justify-content: normal;

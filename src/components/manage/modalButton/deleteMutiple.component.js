@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import Button from "@material-ui/core/Button";
-import AddIcon from "@material-ui/icons/Add";
+import DeleteIcon from "@material-ui/icons/Delete";
 import { useMediaPredicate } from "react-media-hook";
 
 const useStyles = makeStyles(theme => ({
@@ -10,12 +10,13 @@ const useStyles = makeStyles(theme => ({
     position: "absolute",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
-    padding: '10px'
+    padding: "10px"
   }
 }));
 
-export default function AddBtn() {
+export default function DeleteMutipleBtn(props) {
   const classes = useStyles();
+  const numberOfPlans = props.numberOfPlans;
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = React.useState(false);
   const isBiggerThan420 = useMediaPredicate("(max-width: 420px)");
@@ -31,13 +32,13 @@ export default function AddBtn() {
   return (
     <div>
       <Button
+        variant="contained"
         type="button"
         onClick={handleOpen}
-        variant="contained"
-        color="primary"
-        startIcon={<AddIcon />}
+        color="secondary"
+        startIcon={<DeleteIcon />}
       >
-        Add
+        Delete
       </Button>
       <Modal
         aria-labelledby="simple-modal-title"
@@ -49,13 +50,13 @@ export default function AddBtn() {
           style={{
             top: 160,
             left: isBiggerThan420 ? 5 : "calc(50% - 210px)",
-            width: isBiggerThan420? "calc(100% - 30px)" : 400
+            width: isBiggerThan420 ? "calc(100% - 30px)" : 400
           }}
           className={classes.paper}
         >
-          <h2 id="simple-modal-title">Add plans</h2>
+          <h2 id="simple-modal-title">Delete</h2>
           <p id="simple-modal-description">
-            Add your plans here
+            Are you sure to delete the {numberOfPlans} plans. 
           </p>
         </div>
       </Modal>
