@@ -4,7 +4,8 @@ import Cookies from "universal-cookie";
 import "../Planner.css";
 import Calendar from "./calendar.component";
 import Settings from "./settings.component";
-import { BrowserRouter as Switch, Route, Link } from "react-router-dom";
+import Manage from "./manage.component";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 const cookies = new Cookies();
 
@@ -16,8 +17,11 @@ export default class Planner extends Component {
     this.onChangeUpdate = this.onChangeUpdate.bind(this);
     this.onUpdateFromSettings = this.onUpdateFromSettings.bind(this);
     this.getCurrentDate = this.getCurrentDate.bind(this);
+    this.toggleChecked = this.toggleChecked.bind(this);
+    this.unChecked = this.unChecked.bind(this);
 
     this.state = {
+      isChecked:false,
       id: "",
       email: "",
       name: "",
@@ -39,6 +43,13 @@ export default class Planner extends Component {
       ],
       canEditEmail: true
     };
+  }
+
+  unChecked(){
+    this.setState({isChecked: false});
+  }
+  toggleChecked(){
+    this.setState({isChecked: !this.state.isChecked});
   }
 
   getCurrentDate(){
@@ -134,11 +145,12 @@ export default class Planner extends Component {
       canEditEmail,
       currentDate,
       currentViewName,
-      appointment
+      appointment,
+      isChecked
     } = this.state;
     return (
       <React.Fragment>
-        <input id="hamburger" className="hamburger" type="checkbox" />
+        <input id="hamburger" onClick={this.toggleChecked} className="hamburger" type="checkbox" checked={isChecked}/>
         <label htmlFor="hamburger" className="hamburger">
           <i></i>
           <div>
@@ -148,56 +160,22 @@ export default class Planner extends Component {
         </label>
         <nav className="primnav">
           <ul>
-            <li>
+            <li onClick={this.unChecked}>
               <Link title="Dashboard" to="/planner/dashboard">
                 <i className="fas fa-calendar-alt icon"></i> Dashboard
               </Link>
             </li>
-            <li>
-              <Link to="">
+            <li onClick={this.unChecked}>
+              <Link to="/planner/manage">
                 <i className="fas fa-tasks icon"></i>Manage
-                <div className="tag">53</div>
+                <div className="tag">24</div>
               </Link>
-              <ul className="secnav">
-                <li>
-                  <Link title="Plans" to="">
-                    Plans
-                  </Link>
-                </li>
-                <li>
-                  <Link title="Blocks" to="">
-                    Blocks
-                  </Link>
-                </li>
-              </ul>
             </li>
-            <li>
+            <li onClick={this.unChecked}>
               <Link title="Notifications" to="">
                 <i className="fas fa-bell icon"></i>Notifications
-                <div className="tag">17</div>
+                <div className="tag">22</div>
               </Link>
-            </li>
-            <li>
-              <Link title="Tool kit" to="">
-                <i className="fas fa-toolbox icon"></i>Tool kit
-              </Link>
-              <ul className="secnav">
-                <li>
-                  <Link title="Add" to="">
-                    Add
-                  </Link>
-                </li>
-                <li>
-                  <Link title="Import textbook" to="">
-                    Import textbook
-                  </Link>
-                </li>
-                <li>
-                  <Link title="Delete" to="">
-                    Delete
-                  </Link>
-                </li>
-              </ul>
             </li>
           </ul>
         </nav>
@@ -208,7 +186,7 @@ export default class Planner extends Component {
             <section>
               <div className="nameReplace">{this.state.name}</div>
               <div className="actionsReplace">
-                <Link to="/planner/settings">settings</Link> |{" "}
+                <Link onClick={this.unChecked} to="/planner/settings">settings</Link> |{" "}
                 <a className="signout" onClick={this.signout}>
                   logout
                 </a>
@@ -252,6 +230,15 @@ export default class Planner extends Component {
                 defaultCurrentDate={currentDate}
                 currentViewName={currentViewName}
                 viewChange={this.currentViewNameChange}
+              />
+            )}
+          />
+
+          <Route
+            path="/planner/manage"
+            component={() => (
+              <Manage
+                
               />
             )}
           />
