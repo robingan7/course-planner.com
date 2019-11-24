@@ -26,6 +26,7 @@ export default class Planner extends Component {
     this.toggleChecked = this.toggleChecked.bind(this);
     this.unChecked = this.unChecked.bind(this);
     this.doNothing = this.doNothing.bind(this);
+    this.getAppointment = this.getAppointment.bind(this);
 
     this.state = {
       isChecked: false,
@@ -36,22 +37,32 @@ export default class Planner extends Component {
       imageUrl: "",
       currentDate: this.getCurrentDate(),
       currentViewName: "Month",
-      appointment: [
-        {
-          startDate: "2019-10-31 10:00",
-          endDate: "2019-10-31 11:00",
-          title: "2.2"
-        },
-        {
-          startDate: "2019-11-12 18:00",
-          endDate: "2019-11-13 19:30",
-          title: "2.3"
-        }
-      ],
+      mainResourceName: "period",
+      resources: [],
+      appointment: [],
       canEditEmail: true
     };
+
   }
 
+  getAppointment(idInput){
+   const user = {
+     id: idInput
+   };
+    axios
+      .post(this.props.serverLink + "/signup-login/getAppointment", user)
+      .then(res => {
+        if (res.data.message == "Got it!") {
+          this.setState({
+            appointment: res.data.schedule,
+            resources: res.data.resources
+          });
+        }
+      })
+      .catch(err => {
+        console.log("error in getAppointment()");
+      });
+  }
   unChecked() {
     this.setState({ isChecked: false });
   }
@@ -119,6 +130,7 @@ export default class Planner extends Component {
           canEditEmail: true
         });
       }
+      this.getAppointment(allCookies.cp__id);
     }
   }
 

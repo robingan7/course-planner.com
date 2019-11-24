@@ -495,6 +495,32 @@ label.hamburger {
   margin-top:-17px;
 }
 
+.modalTitle{
+  text-align: center;
+  margin-bottom:5px;
+}
+
+.DayPickerInput-OverlayWrapper{
+  z-index: 10;
+}
+
+.modalP{
+  text-align: center;
+  margin:0;
+}
+
+.DayPickerInput{
+  width: 209px;
+  margin:0;
+  margin-left: calc(50% - 104.5px);
+}
+
+.DayPickerInput input{
+  width: 189px;
+  padding:10px;
+  margin:0;
+}
+
 /*not used
 
 input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(5) {

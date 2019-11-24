@@ -5,6 +5,24 @@ let Signup = require("../models/signup.model");
 
 router.route("/").get((req, res) => {});
 
+router.route("/getAppointment").post(async (req, res) => {
+  try {
+    let filter = { _id: req.body.id };
+    let user = await Signup.findOne(filter).exec();
+    if (!user) {
+      return res.send({ message: "The id does not exist" });
+    }
+    let callback = { message: "Got it!" };
+
+    callback.schedule = JSON.parse(user.schedule);
+    callback.resources = JSON.parse(user.resources);
+
+    res.send(callback);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 router.route("/signup").post((req, res) => {
   signupHelper(req, res, false);
 });
@@ -83,12 +101,26 @@ function signupHelper(req, res, isGoogle){
       const loginType = req.body.loginType;
       const date = Date.parse(req.body.date);
 
+      const schedule = JSON.stringify([]).trim();
+      const resources = JSON.stringify([
+        {
+          fieldName: "period",
+          title: "Period",
+          instances: [
+            { id: "Default Class", text: "Default Class" },
+            { id: "Off", text: "Off" }
+          ]
+        }
+      ]).trim();
+
       let newUser = new Signup({
         username,
         email,
         password,
         loginType,
-        date
+        date,
+        schedule,
+        resources
       });
 
       if (isGoogle) {
@@ -100,6 +132,8 @@ function signupHelper(req, res, isGoogle){
           email,
           loginType,
           date,
+          schedule,
+          resources,
           googleId,
           imageUrl
         });

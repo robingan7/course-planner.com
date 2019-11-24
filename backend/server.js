@@ -11,7 +11,11 @@ app.use(cors());
 app.use(express.json());
 
 const uri = "mongodb://localhost:27017/Courseplanner";
-mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true });
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true
+});
 const connection = mongoose.connection;
 connection.once("open", () => {
   console.log("MongoDB database connection established successfully");

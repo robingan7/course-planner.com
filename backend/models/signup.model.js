@@ -10,7 +10,9 @@ const signupSchema = new Schema(
     loginType: { type: String, required: true },
     date: { type: Date, required: true },
     googleId: { type: String, required: false },
-    imageUrl: { type: String, required: false }
+    imageUrl: { type: String, required: false },
+    schedule: { type: String, required: true },
+    resources: { type: String, required: true }
   },
   {
     timestamps: true
