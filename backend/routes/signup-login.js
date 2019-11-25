@@ -107,7 +107,7 @@ function signupHelper(req, res, isGoogle){
           fieldName: "period",
           title: "Period",
           instances: [
-            { id: "Default Class", text: "Default Class" },
+            { id: "Other", text: "Other" },
             { id: "Off", text: "Off" }
           ]
         }

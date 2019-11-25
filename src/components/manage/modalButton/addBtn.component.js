@@ -11,6 +11,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import DayPickerInput from "react-day-picker/DayPickerInput";
 import AddIcon from "@material-ui/icons/Add";
+import CancelIcon from "@material-ui/icons/Cancel";
 
 import "react-day-picker/lib/style.css";
 
@@ -43,12 +44,31 @@ export default function AddBtn() {
   const [open, setOpen] = React.useState(false);
   const isBiggerThan420 = useMediaPredicate("(max-width: 420px)");
 
+  let state = {
+    startDate: "",
+    endDate: "",
+    title: "",
+    period: "",
+    notes: ""
+  };
+
   const handleOpen = () => {
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleChange = (e) => {
+    const {
+      target: { name, value }
+    } = e;
+    state[name] = value;
+  }
+
+  const handleChange2 = (name, value) => {
+    state[name] = value;
   };
 
   return (
@@ -70,13 +90,16 @@ export default function AddBtn() {
       >
         <div
           style={{
-            top: isBiggerThan420 ? 10 : 160,
+            top: isBiggerThan420 ? 10 : 99,
             left: isBiggerThan420 ? 5 : "calc(50% - 210px)",
             width: isBiggerThan420 ? "calc(100% - 30px)" : 400,
             height: isBiggerThan420 ? "calc(100% - 40px)" : "auto"
           }}
           className={classes.paper}
         >
+          <Grid item className="closeIconGrid">
+            <CancelIcon className="closeIcon" onClick={handleClose} />
+          </Grid>
           <h2 id="simple-modal-title" className="modalTitle">
             Add
           </h2>
@@ -85,13 +108,13 @@ export default function AddBtn() {
             <p className="modalP">Start Date</p>
             <DayPickerInput
               className={classes.modalInput}
-              onDayChange={day => console.log(day)}
+              onDayChange={day => handleChange2("startDate", day.getDay())}
             />
 
             <p className="modalP">End Date</p>
             <DayPickerInput
               className={classes.modalInput}
-              onDayChange={day => console.log(day)}
+              onDayChange={day => handleChange2("endDate", day.getDay())}
             />
             <Grid
               container
@@ -103,22 +126,25 @@ export default function AddBtn() {
                 <TitleIcon />
               </Grid>
               <Grid item>
-                <TextField id="input-with-icon-grid" label="Title" />
+                <TextField
+                  id="input-with-icon-grid"
+                  label="Title"
+                  name="title"
+                  onChange={handleChange}
+                />
               </Grid>
             </Grid>
             <FormControl className={classes.modalInput}>
               <InputLabel id="demo-simple-select-label">Period</InputLabel>
               <Select
                 native
-                value={10}
-                inputProps={{
-                  name: "age",
-                  id: "age-native-simple"
-                }}
+                
+                name="period"
+                onChange={handleChange}
               >
                 <option value="" />
-                <option value={10}>Default</option>
-                <option value={20}>Off</option>
+                <option value={"Other"}>Other</option>
+                <option value={"Off"}>Off</option>
               </Select>
             </FormControl>
             <TextField
@@ -130,6 +156,8 @@ export default function AddBtn() {
               className={classes.modalInput}
               margin="normal"
               variant="outlined"
+              name="notes"
+              onChange={handleChange}
             />
 
             <Button

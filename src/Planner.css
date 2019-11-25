@@ -38,7 +38,7 @@ input.hamburger:checked ~ label > div::before {
 }
 
 label.hamburger {
-  z-index: 9999;
+  z-index: 11;
   position: relative;
   display: block;
   height: 50px;
@@ -357,7 +357,7 @@ input.hamburger:checked ~ label .openReplace {
 }
 
 label.hamburger {
-  z-index: 9999;
+  z-index: 11;
   position: relative;
   display: block;
   height: 24px;
@@ -513,12 +513,24 @@ label.hamburger {
   width: 209px;
   margin:0;
   margin-left: calc(50% - 104.5px);
+  margin-bottom:8px;
 }
 
 .DayPickerInput input{
   width: 189px;
   padding:10px;
   margin:0;
+}
+
+.closeIconGrid{
+  z-index:13;
+}
+.closeIcon{
+  cursor: pointer;
+}
+
+.closeIcon:hover{
+  color:red;
 }
 
 /*not used

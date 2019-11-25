@@ -25,7 +25,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function PlansList(props) {
-    console.log(props);
   const classes = useStyles();
   const [checked, setChecked] = React.useState([0]);
 
