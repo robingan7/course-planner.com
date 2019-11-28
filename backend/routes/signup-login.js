@@ -13,10 +13,8 @@ router.route("/getAppointment").post(async (req, res) => {
       return res.send({ message: "The id does not exist" });
     }
     let callback = { message: "Got it!" };
-
     callback.schedule = JSON.parse(user.schedule);
     callback.resources = JSON.parse(user.resources);
-
     res.send(callback);
   } catch (error) {
     res.status(500).send(error);

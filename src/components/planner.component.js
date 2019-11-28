@@ -39,7 +39,7 @@ export default class Planner extends Component {
       currentViewName: "Month",
       mainResourceName: "period",
       resources: [],
-      appointment: [],
+      appointments: [],
       canEditEmail: true
     };
 
@@ -54,9 +54,10 @@ export default class Planner extends Component {
       .then(res => {
         if (res.data.message == "Got it!") {
           this.setState({
-            appointment: res.data.schedule,
+            appointments: res.data.schedule,
             resources: res.data.resources
           });
+
         }
       })
       .catch(err => {
@@ -99,7 +100,9 @@ export default class Planner extends Component {
     });
 
     promise.then(res => {
-      window.location = "/";
+      setTimeout(() => {
+        window.location = "/";
+      }, 900);
     });
   }
 
@@ -166,7 +169,7 @@ export default class Planner extends Component {
       canEditEmail,
       currentDate,
       currentViewName,
-      appointment,
+      appointments,
       isChecked
     } = this.state;
     return (
@@ -252,7 +255,7 @@ export default class Planner extends Component {
             exact
             component={() => (
               <Calendar
-                appointments={appointment}
+                appointments={appointments}
                 defaultCurrentDate={currentDate}
                 currentViewName={currentViewName}
                 viewChange={this.currentViewNameChange}
@@ -277,7 +280,7 @@ export default class Planner extends Component {
             path="/planner/dashboard"
             component={() => (
               <Calendar
-                appointments={appointment}
+                appointments={appointments}
                 defaultCurrentDate={currentDate}
                 currentViewName={currentViewName}
                 viewChange={this.currentViewNameChange}

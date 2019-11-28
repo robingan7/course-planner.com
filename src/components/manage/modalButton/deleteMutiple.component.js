@@ -15,12 +15,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import CancelIcon from "@material-ui/icons/Cancel";
 
 const useStyles = makeStyles(theme => ({
-  paper: {
-    position: "absolute",
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
-    padding: "10px"
-  },
+  
   modalInput: {
     width: 209,
     margin:0,
@@ -78,15 +73,7 @@ export default function DeleteMutipleBtn(props) {
         open={open}
         onClose={handleClose}
       >
-        <div
-          style={{
-            top: isBiggerThan420 ? 10 : 99,
-            left: isBiggerThan420 ? 5 : "calc(50% - 210px)",
-            width: isBiggerThan420 ? "calc(100% - 30px)" : 400,
-            height: isBiggerThan420 ? "calc(100% - 40px)" : "auto"
-          }}
-          className={classes.paper}
-        >
+        <div className="modalBody">
           <Grid item>
             <CancelIcon className="closeIcon" onClick={handleClose} />
           </Grid>

@@ -26,6 +26,7 @@ export default class Manage extends Component {
                   variant="contained"
                   color="primary"
                   aria-label="full-width contained primary button group"
+                  style={{marginLeft:10}}
                 >
                   <AddBtn />
                   <DeleteMutipleBtn numberOfPlans={0}/>

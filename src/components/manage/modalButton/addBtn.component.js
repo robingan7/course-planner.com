@@ -12,16 +12,12 @@ import Select from "@material-ui/core/Select";
 import DayPickerInput from "react-day-picker/DayPickerInput";
 import AddIcon from "@material-ui/icons/Add";
 import CancelIcon from "@material-ui/icons/Cancel";
-
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 import "react-day-picker/lib/style.css";
 
 const useStyles = makeStyles(theme => ({
-  paper: {
-    position: "absolute",
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
-    padding: "10px"
-  },
+  
   modalInput: {
     width: 209,
     marginLeft: "calc(50% - 104.5px)",
@@ -43,13 +39,19 @@ export default function AddBtn() {
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = React.useState(false);
   const isBiggerThan420 = useMediaPredicate("(max-width: 420px)");
-
-  let state = {
+  const [state, setState] = React.useState({
+    isAutoAdjust: true
+  });
+  let stateEdit = {
     startDate: "",
     endDate: "",
     title: "",
     period: "",
     notes: ""
+  };
+
+  const handleChangeSwitch = name => event => {
+    setState({ [name]: event.target.checked });
   };
 
   const handleOpen = () => {
@@ -64,11 +66,11 @@ export default function AddBtn() {
     const {
       target: { name, value }
     } = e;
-    state[name] = value;
+    stateEdit[name] = value;
   }
 
   const handleChange2 = (name, value) => {
-    state[name] = value;
+    stateEdit[name] = value;
   };
 
   return (
@@ -88,21 +90,15 @@ export default function AddBtn() {
         open={open}
         onClose={handleClose}
       >
-        <div
-          style={{
-            top: isBiggerThan420 ? 10 : 99,
-            left: isBiggerThan420 ? 5 : "calc(50% - 210px)",
-            width: isBiggerThan420 ? "calc(100% - 30px)" : 400,
-            height: isBiggerThan420 ? "calc(100% - 40px)" : "auto"
-          }}
-          className={classes.paper}
-        >
+        <div className="modalBody">
           <Grid item className="closeIconGrid">
             <CancelIcon className="closeIcon" onClick={handleClose} />
           </Grid>
           <h2 id="simple-modal-title" className="modalTitle">
             Add
           </h2>
+
+          <h3 className="modalError">Error</h3>
 
           <form className={classes.form}>
             <p className="modalP">Start Date</p>
@@ -138,7 +134,6 @@ export default function AddBtn() {
               <InputLabel id="demo-simple-select-label">Period</InputLabel>
               <Select
                 native
-                
                 name="period"
                 onChange={handleChange}
               >
@@ -159,7 +154,18 @@ export default function AddBtn() {
               name="notes"
               onChange={handleChange}
             />
-
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={state.isAutoAdjust}
+                  color="primary"
+                  value="isAutoAdjust"
+                  onChange={handleChangeSwitch("isAutoAdjust")}
+                />
+              }
+              label="Auto adjust"
+              className={classes.modalInput}
+            />
             <Button
               variant="contained"
               color="primary"

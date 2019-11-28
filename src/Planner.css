@@ -425,7 +425,7 @@ label.hamburger {
   left: 17px;
 }
 
-.MuiPaper-root{
+.calendarBody{
     position: absolute;
     top:70px;
     left:10px;
@@ -436,17 +436,17 @@ label.hamburger {
 
 .regular-container{
   position: absolute;
-    top:70px;
-    left:10px;
-    height:calc(100% - 90px);
-    margin-right:10px;
-    width:calc(100% - 25px);
+  top:70px;
+  left:10px;
+  height:calc(100% - 90px);
+  margin-right:10px;
+  width:calc(100% - 25px);
 }
 .regular-container form{
-    justify-content: normal;
+  justify-content: normal;
 }
 @media (min-width: 650px) {
-    .MuiPaper-root{
+    .calendarBody{
         top:85px;
         left:80px;
         height:calc(100% - 100px);
@@ -474,10 +474,6 @@ label.hamburger {
 .subTitle{
   margin:10px 0;
   border-bottom: 2px solid black;
-}
-
-.MuiButtonGroup-root{
-  margin-left:10px;
 }
 
 .manageContent{
@@ -523,6 +519,7 @@ label.hamburger {
 }
 
 .closeIconGrid{
+  position:fixed;
   z-index:13;
 }
 .closeIcon{
@@ -533,6 +530,38 @@ label.hamburger {
   color:red;
 }
 
+.modalError{
+  color:red;
+  text-align: center;
+  font-size:17px;
+  margin:2px 0;
+}
+
+.modalBody{
+  position: absolute;
+  top:99px;
+  left:calc(50% - 210px);
+  width:400px;
+  height:auto;
+  overflow:scroll;
+  background-color: #fff;
+  padding:10px;
+}
+
+@media(min-width:420px) AND (max-height:750px){
+  .modalBody{
+    top:10px;
+    height:calc(100% - 40px);
+  }
+}
+@media(max-width:420px){
+  .modalBody{
+    top:10px;
+    left:5px;
+    width:calc(100% - 30px);
+    height:calc(100% - 40px);
+  }
+}
 /*not used
 
 input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(5) {
