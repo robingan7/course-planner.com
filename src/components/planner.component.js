@@ -10,6 +10,8 @@ import Notification from "./planner/notification.component";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 const cookies = new Cookies();
+const DEFAULT_STARTTIME = "00:00";
+const DEFAULT_ENDTIME = "00:01";
 
 export default class Planner extends Component {
   constructor(props) {
@@ -27,6 +29,8 @@ export default class Planner extends Component {
     this.unChecked = this.unChecked.bind(this);
     this.doNothing = this.doNothing.bind(this);
     this.getAppointment = this.getAppointment.bind(this);
+    this.appointFunc = this.appointFunc.bind(this);
+    this.updateAppointmentsToMongo = this.updateAppointmentsToMongo.bind(this);
 
     this.state = {
       isChecked: false,
@@ -35,7 +39,7 @@ export default class Planner extends Component {
       name: "",
       googleId: "",
       imageUrl: "",
-      currentDate: this.getCurrentDate(),
+      currentDate: this.getCurrentDate(new Date()),
       currentViewName: "Month",
       mainResourceName: "period",
       resources: [],
@@ -45,6 +49,54 @@ export default class Planner extends Component {
 
   }
 
+  /* edit appointments methods */
+  addDefaultTime(appoint){
+    let { startDate, endDate } = appoint;
+    appoint.startDate = this.getCurrentDate(startDate) + "T" + DEFAULT_STARTTIME;
+    appoint.endDate = this.getCurrentDate(endDate) + "T" + DEFAULT_ENDTIME;
+
+    return appoint;
+  }
+
+  updateAppointmentsToMongo(appoint) {
+    const user = {
+      filter: {
+        _id: this.state.id
+      },
+      update: {
+        schedule: JSON.stringify(appoint)
+      }
+    };
+
+    axios
+      .post(this.props.serverLink + "/signup-login/update", user)
+      .then(res => {
+        const updated = JSON.parse(res.data.info.schedule);
+        this.setState({ appointments: updated});
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
+  appointFunc(appoint, type) {
+    if(type === "add") {
+      const addApoointment = this.addDefaultTime(appoint);
+      let copy = this.state.appointments;
+      copy.push(addApoointment);
+      copy.sort((a, b) => { 
+        if(a.startDate > b.startDate){
+            return 1;
+        } else if (a.startDate < b.startDate){
+            return -1;
+        }
+        return 0;
+      });
+      this.updateAppointmentsToMongo(copy);         
+    }
+  }
+
+  /* ----------------- */
   getAppointment(idInput){
    const user = {
      id: idInput
@@ -59,6 +111,7 @@ export default class Planner extends Component {
           });
 
         }
+        //console.log(res.data.schedule, res.data.resources);
       })
       .catch(err => {
         console.log("error in getAppointment()");
@@ -71,11 +124,10 @@ export default class Planner extends Component {
     this.setState({ isChecked: !this.state.isChecked });
   }
 
-  getCurrentDate() {
-    var d = new Date(),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
+  getCurrentDate(d) {
+      let month = "" + (d.getMonth() + 1),
+          day = "" + d.getDate(),
+          year = d.getFullYear();
 
     if (month.length < 2) month = "0" + month;
     if (day.length < 2) day = "0" + day;
@@ -170,15 +222,12 @@ export default class Planner extends Component {
       currentDate,
       currentViewName,
       appointments,
-      isChecked
+      isChecked,
+      resources
     } = this.state;
     return (
       <React.Fragment>
-        <img
-          src="/logo192.png"
-          className="logoImg"
-          alt="logoImg"
-        />
+        <img src="/logo192.png" className="logoImg" alt="logoImg" />
         <input
           id="hamburger"
           onClick={this.toggleChecked}
@@ -198,8 +247,7 @@ export default class Planner extends Component {
           <ul>
             <li onClick={this.unChecked}>
               <Link title="Dashboard" to="/planner/dashboard">
-                <i className="fas fa-calendar-alt icon"></i>{" "}
-                Dashboard
+                <i className="fas fa-calendar-alt icon"></i> Dashboard
               </Link>
             </li>
             <li onClick={this.unChecked}>
@@ -209,10 +257,7 @@ export default class Planner extends Component {
               </Link>
             </li>
             <li onClick={this.unChecked}>
-              <Link
-                title="Notification"
-                to="/planner/notification"
-              >
+              <Link title="Notification" to="/planner/notification">
                 <i className="fas fa-bell icon"></i>Notification
                 <div className="tag">22</div>
               </Link>
@@ -230,14 +275,9 @@ export default class Planner extends Component {
           <section>
             <img src={this.state.imageUrl} />
             <section>
-              <div className="nameReplace">
-                {this.state.name}
-              </div>
+              <div className="nameReplace">{this.state.name}</div>
               <div className="actionsReplace">
-                <Link
-                  onClick={this.unChecked}
-                  to="/planner/settings"
-                >
+                <Link onClick={this.unChecked} to="/planner/settings">
                   settings
                 </Link>{" "}
                 |{" "}
@@ -259,6 +299,7 @@ export default class Planner extends Component {
                 defaultCurrentDate={currentDate}
                 currentViewName={currentViewName}
                 viewChange={this.currentViewNameChange}
+                resources={resources}
               />
             )}
           />
@@ -283,6 +324,7 @@ export default class Planner extends Component {
                 appointments={appointments}
                 defaultCurrentDate={currentDate}
                 currentViewName={currentViewName}
+                resources={resources}
                 viewChange={this.currentViewNameChange}
               />
             )}
@@ -290,7 +332,13 @@ export default class Planner extends Component {
 
           <Route
             path="/planner/manage"
-            component={() => <Manage />}
+            component={() => (
+              <Manage
+                appointments={appointments}
+                appointFunc={this.appointFunc}
+                resources={resources}
+              />
+            )}
           />
 
           <Route
@@ -298,10 +346,7 @@ export default class Planner extends Component {
             component={() => <Notification />}
           />
 
-          <Route
-            path="/planner/question"
-            component={() => <Question />}
-          />
+          <Route path="/planner/question" component={() => <Question />} />
         </Switch>
       </React.Fragment>
     );

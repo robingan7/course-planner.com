@@ -494,6 +494,7 @@ label.hamburger {
 .modalTitle{
   text-align: center;
   margin-bottom:5px;
+  font-size:22px;
 }
 
 .DayPickerInput-OverlayWrapper{
@@ -543,7 +544,7 @@ label.hamburger {
   left:calc(50% - 210px);
   width:400px;
   height:auto;
-  overflow:scroll;
+  overflow:auto;
   background-color: #fff;
   padding:10px;
 }
@@ -561,6 +562,11 @@ label.hamburger {
     width:calc(100% - 30px);
     height:calc(100% - 40px);
   }
+}
+
+.planName{
+  font-size:22px;
+  text-decoration: underline;
 }
 /*not used
 

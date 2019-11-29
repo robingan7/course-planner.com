@@ -34,24 +34,22 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function AddBtn() {
+export default function AddBtn(props) {
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = React.useState(false);
   const isBiggerThan420 = useMediaPredicate("(max-width: 420px)");
-  const [state, setState] = React.useState({
-    isAutoAdjust: true
-  });
-  let stateEdit = {
-    startDate: "",
-    endDate: "",
-    title: "",
-    period: "",
-    notes: ""
-  };
+  const [isAutoAdjust, setIsAutoAdjust] = React.useState(true);
+  const [error, setError] = React.useState("");
+
+  const [startDate, setStartDate] = React.useState("");
+  const [endDate, setEndDate] = React.useState("");
+  const [title, setTitle] = React.useState("");
+  const [period, setPeriod] = React.useState("");
+  const [notes, setNotes] = React.useState("");
 
   const handleChangeSwitch = name => event => {
-    setState({ [name]: event.target.checked });
+    setIsAutoAdjust( event.target.checked );
   };
 
   const handleOpen = () => {
@@ -66,12 +64,62 @@ export default function AddBtn() {
     const {
       target: { name, value }
     } = e;
-    stateEdit[name] = value;
+
+    switch (name) {
+      case 'title':
+        setTitle(value);
+        break;
+      case 'period':
+        setPeriod(value);
+        break;
+      case 'notes':
+        setNotes(value);
+        break;
+      default:
+        console.log('invalid name');
+    }
   }
 
   const handleChange2 = (name, value) => {
-    stateEdit[name] = value;
+    switch (name) {
+      case 'startDate':
+        setStartDate(value);
+        break;
+      case 'endDate':
+        setEndDate(value);
+        break;
+      default:
+        console.log('invalid name in handleChange2');
+    }
   };
+
+  const isFullFilled = () => {
+    return startDate != '' && endDate != '' && title != '' && period != '';
+  }
+
+  const addAppoint = () => {
+    if (!isFullFilled()) {
+      setError( "Please fill in all the fields" );
+    } else if (endDate < startDate) {
+      setError("Start date should be smaller or equal to end date");
+    } else {
+      props.appointFunc({
+        note: notes,
+        title: title,
+        endDate: endDate,
+        period: period,
+        startDate: startDate,
+        isAutoAdjust: isAutoAdjust
+      }, "add");
+    }
+  }
+
+  let array = [];
+  props.resources.map(resource => {
+    if (resource.fieldName == "period") {
+      array = resource.instances;
+    }
+  });
 
   return (
     <div>
@@ -98,19 +146,19 @@ export default function AddBtn() {
             Add
           </h2>
 
-          <h3 className="modalError">Error</h3>
+          <h3 className="modalError">{error}</h3>
 
           <form className={classes.form}>
             <p className="modalP">Start Date</p>
             <DayPickerInput
               className={classes.modalInput}
-              onDayChange={day => handleChange2("startDate", day.getDay())}
+              onDayChange={day => handleChange2("startDate", day)}
             />
 
             <p className="modalP">End Date</p>
             <DayPickerInput
               className={classes.modalInput}
-              onDayChange={day => handleChange2("endDate", day.getDay())}
+              onDayChange={day => handleChange2("endDate", day)}
             />
             <Grid
               container
@@ -132,14 +180,11 @@ export default function AddBtn() {
             </Grid>
             <FormControl className={classes.modalInput}>
               <InputLabel id="demo-simple-select-label">Period</InputLabel>
-              <Select
-                native
-                name="period"
-                onChange={handleChange}
-              >
+              <Select native name="period" onChange={handleChange}>
                 <option value="" />
-                <option value={"Other"}>Other</option>
-                <option value={"Off"}>Off</option>
+                {array.map(instance => {
+                  return <option value={instance.id}>{instance.text}</option>;
+                })}
               </Select>
             </FormControl>
             <TextField
@@ -157,10 +202,10 @@ export default function AddBtn() {
             <FormControlLabel
               control={
                 <Switch
-                  checked={state.isAutoAdjust}
+                  checked={isAutoAdjust}
                   color="primary"
                   value="isAutoAdjust"
-                  onChange={handleChangeSwitch("isAutoAdjust")}
+                  onChange={handleChangeSwitch()}
                 />
               }
               label="Auto adjust"
@@ -171,6 +216,7 @@ export default function AddBtn() {
               color="primary"
               className={classes.modalBtn}
               startIcon={<AddIcon />}
+              onClick={addAppoint}
             >
               Add
             </Button>

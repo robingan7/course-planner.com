@@ -15,21 +15,29 @@ export default class Manage extends Component {
     }
   
     render() {
+    const {
+      appointFunc,
+      resources
+    } = this.props;
+
         return (
           <div className="regular-container">
             <h1>Manage</h1>
             <div className="manageContent">
               <h2 className="subTitle">Plans</h2>
-              <PlansList name="jjj" />
+              <PlansList appointments={this.props.appointments} />
               <Grid item className="toolKit">
                 <ButtonGroup
                   variant="contained"
                   color="primary"
                   aria-label="full-width contained primary button group"
-                  style={{marginLeft:10}}
+                  style={{ marginLeft: 10 }}
                 >
-                  <AddBtn />
-                  <DeleteMutipleBtn numberOfPlans={0}/>
+                  <AddBtn
+                    appointFunc={appointFunc}
+                    resources={resources}
+                  />
+                  <DeleteMutipleBtn numberOfPlans={0} />
                 </ButtonGroup>
               </Grid>
               <h2 className="subTitle">Blocks & Textbook</h2>

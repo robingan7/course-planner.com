@@ -16,9 +16,46 @@ import {
   AppointmentForm,
   ConfirmationDialog
 } from "@devexpress/dx-react-scheduler-material-ui";
-import { useMediaPredicate } from "react-media-hook";
+import { Resources } from "@devexpress/dx-react-scheduler-material-ui";
+
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import { withStyles } from '@material-ui/core/styles';
 
 const SHIFT_KEY = 16;
+const styles = theme => ({
+  container: {
+    display: 'flex',
+    marginBottom: theme.spacing(2),
+    justifyContent: 'flex-end',
+  },
+  text: {
+    ...theme.typography.h6,
+    marginRight: theme.spacing(2),
+  },
+});
+
+const ResourceSwitcher = withStyles(styles, { name: 'ResourceSwitcher' })(
+  ({
+    mainResourceName, onChange, classes, resources,
+  }) => (
+      <div className={classes.container}>
+        <div className={classes.text}>
+          Main resource name:
+      </div>
+        <Select
+          value={mainResourceName}
+          onChange={e => onChange(e.target.value)}
+        >
+          {resources.map(resource => (
+            <MenuItem key={resource.fieldName} value={resource.fieldName}>
+              {resource.title}
+            </MenuItem>
+          ))}
+        </Select>
+      </div>
+    ),
+);
 
 export default class Calendar extends Component {
   constructor(props) {
@@ -26,9 +63,15 @@ export default class Calendar extends Component {
     this.commitChanges = this.commitChanges.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
+    this.changeMainResource = this.changeMainResource.bind(this);
     this.state = {
-      isShiftPressed: false
+      isShiftPressed: false,
+      mainResourceName: 'period'
     };
+  }
+
+  changeMainResource(mainResourceName) {
+    this.setState({ mainResourceName });
   }
 
   componentDidMount() {
@@ -88,7 +131,8 @@ export default class Calendar extends Component {
       appointments,
       currentDate,
       currentViewName,
-      viewChange
+      viewChange,
+      resources
     } = this.props;
 
     return (
@@ -130,6 +174,10 @@ export default class Calendar extends Component {
           />
           <DragDropProvider />
           <AppointmentForm />
+          <Resources
+            data={resources}
+            mainResourceName={this.state.mainResourceName}
+          />
         </Scheduler>
       </Paper>
       </div>

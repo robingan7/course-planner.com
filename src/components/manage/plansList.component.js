@@ -43,16 +43,16 @@ export default function PlansList(props) {
 
   return (
     <List className={classes.root}>
-      {[2.2, 2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.1].map(value => {
-        const labelId = `checkbox-list-label-${value}`;
+      {props.appointments.map(appointment => {
+        const labelId = `checkbox-list-label-${appointment.title}`;
 
         return (
           <ListItem
-            key={value}
+            key={appointment.title}
             role={undefined}
             dense
             button
-            onClick={handleToggle(value)}
+            onClick={handleToggle(appointment.title)}
           >
             <ListItemIcon>
               <Checkbox
@@ -62,10 +62,10 @@ export default function PlansList(props) {
                 inputProps={{ "aria-labelledby": labelId }}
               />
             </ListItemIcon>
-            <ListItemText id={labelId} primary={`Unit ${value}`} />
+            <ListItemText id={labelId} primary={appointment.title} />
             <ListItemSecondaryAction>
-              <EditBtn planName={value} />
-              <DeleteSingle planName={value} />
+              <EditBtn planName={appointment.title} />
+              <DeleteSingle planName={appointment.title} />
             </ListItemSecondaryAction>
           </ListItem>
         );

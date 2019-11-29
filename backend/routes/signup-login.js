@@ -5,6 +5,9 @@ let Signup = require("../models/signup.model");
 
 router.route("/").get((req, res) => {});
 
+router.route("/updateAppointments").post(async (req, res) => {
+
+});
 router.route("/getAppointment").post(async (req, res) => {
   try {
     let filter = { _id: req.body.id };
@@ -105,7 +108,7 @@ function signupHelper(req, res, isGoogle){
           fieldName: "period",
           title: "Period",
           instances: [
-            { id: "Other", text: "Other" },
+            { id: "Default_Class", text: "Default Class" },
             { id: "Off", text: "Off" }
           ]
         }

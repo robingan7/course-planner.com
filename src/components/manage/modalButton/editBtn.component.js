@@ -99,19 +99,19 @@ export default function EditBtn(props) {
             <CancelIcon className="closeIcon" onClick={handleClose} />
           </Grid>
           <h2 id="simple-modal-title" className="modalTitle">
-            Edit {planName}
+            Edit <span className="planName">{planName}</span>
           </h2>
           <form className={classes.form}>
             <p className="modalP">Start Date</p>
             <DayPickerInput
               className={classes.modalInput}
-              onDayChange={day => handleChange2("startDate", day.getDay())}
+              onDayChange={day => handleChange2("startDate", day)}
             />
 
             <p className="modalP">End Date</p>
             <DayPickerInput
               className={classes.modalInput}
-              onDayChange={day => handleChange2("endDate", day.getDay())}
+              onDayChange={day => handleChange2("endDate", day)}
             />
             <Grid
               container

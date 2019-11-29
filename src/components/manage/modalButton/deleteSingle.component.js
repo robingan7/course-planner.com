@@ -78,7 +78,7 @@ export default function DeleteSingle(props) {
             <CancelIcon className="closeIcon" onClick={handleClose} />
           </Grid>
           <h2 id="simple-modal-title" className="modalTitle">
-            Delete {planName}
+            Delete <span className="planName">{planName}</span>
           </h2>
           <p className="modalP" id="simple-modal-description">
             Are you sure to delete {planName}?
