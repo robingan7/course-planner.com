@@ -8,6 +8,7 @@ import Manage from "./planner/manage.component";
 import Question from "./planner/question.component";
 import Notification from "./planner/notification.component";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BLOCKS, MAX_NUM_OF_CLASSES} from "../schedules/smchs";
 
 const cookies = new Cookies();
 const DEFAULT_STARTTIME = "00:00";
@@ -50,12 +51,138 @@ export default class Planner extends Component {
   }
 
   /* edit appointments methods */
+  getNextDay(d) {
+    let nextDay = new Date(d);
+    nextDay.setDate(d.getDate() + 1);
+
+    return nextDay;
+  }
+
+  autoAdjust(editSchedule) {
+    let resultList = [];
+
+    for (let i = 0; i < editSchedule.length(); i++) {
+      let currentAppoint = editSchedule[i]
+      let currentPeriod = currentAppoint.period;
+      if (currentPeriod !== "Off"){
+        let validDay = this.getValidDay(currentAppoint.startDate, 
+          resultList, i, currentPeriod);
+        currentAppoint.startDate = validDay;
+        currentAppoint.endDate = validDay;
+
+        resultList.push(Object.assign({}, this.addDefaultTime(currentAppoint)));
+      } else {
+        resultList.push(Object.assign({}, currentAppoint));
+      }
+    }
+
+    return resultList;
+  }
+
+  isWeekEnd(date){
+    let dateObj = new Date(date);
+    return dateObj.getDay() == 0 || dateObj.getDay() == 6;
+  }
+
+  isOnOffDayOnSMCHS(date, period=undefined){
+    let dayBlock = BLOCKS.block[date.split("T")[0]];
+    if (dayBlock == undefined){
+      return this.isWeekEnd(date);
+    }
+    if (dayBlock !== "Off"){
+      if (period != undefined){
+        let dayBlockName = dayBlock.substring(0, dayBlock.length - 1);
+        let dayBlockNumber = Number(dayBlock.slice(-1));
+        let currentBlocks = BLOCKS.sche[dayBlockName];
+        let periodList = [];
+        let addNum = 0;
+        for (let [key, value] of Object.entries(currentBlocks)) {
+          if (key.includes("Block") && !key.includes("/")){
+            if (key.includes("8")){
+              periodList.push(8);
+            } else {
+              let currentPeriod = dayBlockNumber + addNum;
+
+              if (currentPeriod > MAX_NUM_OF_CLASSES){
+                periodList.push(dayBlockNumber - MAX_NUM_OF_CLASSES);
+              } else {
+                periodList.push(dayBlockNumber);
+              }
+              addNum++;
+            }
+          }
+        }
+        return !periodList.includes((Number(period.slice(-1))));
+      }
+      return false;
+    }
+    return true;
+  }
+
+  /**add for school schedule later */
+  isONAnOffDay(date, index, resultList, period){
+    if(index !== 0){
+      if (!this.hasNumber(period)){
+        return resultList[index - 1].period === "Off"
+          || this.isOnOffDayOnSMCHS(date);
+      } else {
+        return resultList[index - 1].period === "Off"
+          || this.isOnOffDayOnSMCHS(date, Number(period.slice(-1)));
+      }
+    }
+    return false;
+  }
+
+  getValidDay(date, resultList, index, period) {
+    if (!this.isONAnOffDay(date, index, resultList, period )){
+      return date.split("T")[0];
+    }
+    let nextDay = this.getNextDay(new Date(date));
+    return this.getValidDay(this.getCurrentDate(nextDay) + "T" + DEFAULT_STARTTIME, 
+                     resultList, index, period);
+  }
+
+  hasNumber(myString) {
+    return /\d/.test(myString);
+  }
+
   addDefaultTime(appoint){
     let { startDate, endDate } = appoint;
     appoint.startDate = this.getCurrentDate(startDate) + "T" + DEFAULT_STARTTIME;
     appoint.endDate = this.getCurrentDate(endDate) + "T" + DEFAULT_ENDTIME;
 
     return appoint;
+  }
+
+  getDuration(appoint) {
+    let startDateNum = new Date(appoint.startDate).getDate();
+    let endDateNum = new Date(appoint.endDate).getDate();
+
+    return endDateNum - startDateNum;
+  }
+
+  getAddDayList(appoint){
+    let duration = this.getDuration(appoint);
+    let startDate = new Date(appoint.startDate);
+    
+    if (duration !== 0) {
+      let newDate = startDate;
+
+      appoint.startDate = startDate;
+      appoint.endDate = appoint.startDate;
+      let result = [Object.assign({}, this.addDefaultTime(appoint))];
+
+      for (let i = 0; i < duration; i++) {
+        newDate = this.getNextDay(newDate);
+        appoint.startDate = newDate;
+        appoint.endDate = newDate;
+
+        let clone = Object.assign({}, this.addDefaultTime(appoint));
+        result.push(clone);
+      }
+      return result;
+    }
+    return [this.addDefaultTime(appoint)];
   }
 
   updateAppointmentsToMongo(appoint) {
@@ -81,9 +208,13 @@ export default class Planner extends Component {
 
   appointFunc(appoint, type) {
     if(type === "add") {
-      const addApoointment = this.addDefaultTime(appoint);
       let copy = this.state.appointments;
-      copy.push(addApoointment);
+      const dayList = this.getAddDayList(appoint);
+      const isAutoAjd = dayList[0].isAutoAdjust;
+
+      for (let ele of dayList) {
+        copy.push(ele);
+      }
       copy.sort((a, b) => { 
         if(a.startDate > b.startDate){
             return 1;
@@ -92,6 +223,14 @@ export default class Planner extends Component {
         }
         return 0;
       });
+
+      if(isAutoAjd) {
+        try{
+          console.log(this.autoAdjust(copy));
+        } catch(err){
+          console.log(err);
+        }
+      }
       this.updateAppointmentsToMongo(copy);         
     }
   }
