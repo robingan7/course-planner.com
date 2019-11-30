@@ -61,12 +61,14 @@ export default class Planner extends Component {
   autoAdjust(editSchedule) {
     let resultList = [];
 
-    for (let i = 0; i < editSchedule.length(); i++) {
+    for (let i = 0; i < editSchedule.length; i++) {
       let currentAppoint = editSchedule[i]
       let currentPeriod = currentAppoint.period;
       if (currentPeriod !== "Off"){
         let validDay = this.getValidDay(currentAppoint.startDate, 
           resultList, i, currentPeriod);
+
+        console.log(validDay);
         currentAppoint.startDate = validDay;
         currentAppoint.endDate = validDay;
 
@@ -129,13 +131,18 @@ export default class Planner extends Component {
         return resultList[index - 1].period === "Off"
           || this.isOnOffDayOnSMCHS(date, Number(period.slice(-1)));
       }
+    } else {
+      if (!this.hasNumber(period)) {
+        return this.isOnOffDayOnSMCHS(date);
+      } else {
+        return this.isOnOffDayOnSMCHS(date, Number(period.slice(-1)));
+      }
     }
-    return false;
   }
 
   getValidDay(date, resultList, index, period) {
     if (!this.isONAnOffDay(date, index, resultList, period )){
-      return date.split("T")[0];
+      return new Date(date);
     }
     let nextDay = this.getNextDay(new Date(date));
     return this.getValidDay(this.getCurrentDate(nextDay) + "T" + DEFAULT_STARTTIME, 
@@ -231,7 +238,7 @@ export default class Planner extends Component {
           console.log(err);
         }
       }
-      this.updateAppointmentsToMongo(copy);         
+      //this.updateAppointmentsToMongo(copy);         
     }
   }
 
