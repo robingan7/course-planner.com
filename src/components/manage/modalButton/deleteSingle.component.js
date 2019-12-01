@@ -36,17 +36,13 @@ const useStyles = makeStyles(theme => ({
 
 export default function DeleteSingle(props) {
   const classes = useStyles();
-  const planName = props.planName;
+  const { planName, id, appointFunc } = props;
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = React.useState(false);
-  const isBiggerThan420 = useMediaPredicate("(max-width: 420px)");
+  const [isAutoAdjust, setIsAutoAdjust] = React.useState(true);
 
-  const [state, setState] = React.useState({
-    isAutoAdjust: true
-  });
-
-  const handleChange = name => event => {
-    setState({ [name]: event.target.checked });
+  const handleChange = event => {
+    setIsAutoAdjust(event.target.checked);
   };
 
   const handleOpen = () => {
@@ -56,6 +52,10 @@ export default function DeleteSingle(props) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const deletePlan = () => {
+    appointFunc({ isAutoAdjust: isAutoAdjust }, "deleteSingle", id);
+  }
 
   return (
     <React.Fragment>
@@ -87,10 +87,10 @@ export default function DeleteSingle(props) {
             <FormControlLabel
               control={
                 <Switch
-                  checked={state.isAutoAdjust}
+                  checked={isAutoAdjust}
                   color="primary"
                   value="isAutoAdjust"
-                  onChange={handleChange("isAutoAdjust")}
+                  onChange={handleChange}
                 />
               }
               label="Auto adjust"
@@ -105,10 +105,11 @@ export default function DeleteSingle(props) {
                   variant="contained"
                   color="primary"
                   startIcon={<CloseIcon />}
+                  onClick={handleClose}
                 >
                   No
                 </Button>
-                <Button variant="contained" startIcon={<CheckIcon />}>
+                <Button variant="contained" startIcon={<CheckIcon />} onClick={deletePlan}>
                   Yes
                 </Button>
               </ButtonGroup>

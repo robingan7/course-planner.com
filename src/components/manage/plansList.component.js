@@ -29,7 +29,24 @@ export default function PlansList(props) {
   const [checked, setChecked] = React.useState([0]);
   const { appointments,
           appointFunc,
-          resources } = props;
+    resources, setDeleteList, deleteList} = props;
+
+  const editDeleteList = (isAdd, id) => {
+    let resultList = deleteList;
+    if (isAdd) {
+      resultList.push(id);
+    } else {
+      resultList = deleteList.filter((value, index, arr) => {
+        return value !== id;
+      });
+    }
+    setDeleteList(resultList);
+  }
+
+  const handleCheckBox = event => {
+    const { tabIndex, checked } = event.target;
+    editDeleteList(checked, tabIndex);
+  };
 
   const handleToggle = value => () => {
     const currentIndex = checked.indexOf(value);
@@ -61,9 +78,10 @@ export default function PlansList(props) {
             <ListItemIcon>
               <Checkbox
                 edge="start"
-                tabIndex={-1}
+                tabIndex={id}
                 disableRipple
                 inputProps={{ "aria-labelledby": labelId }}
+                onChange={handleCheckBox}
               />
             </ListItemIcon>
             <ListItemText id={labelId} primary={appointment.title} />
@@ -71,7 +89,7 @@ export default function PlansList(props) {
               <EditBtn id={id} planName={appointment.title} appointment={appointment} 
                 appointFunc={appointFunc}
                 resources={resources}/>
-              <DeleteSingle planName={appointment.title} />
+              <DeleteSingle planName={appointment.title} id={id} appointFunc={appointFunc}/>
             </ListItemSecondaryAction>
           </ListItem>));
           id++;

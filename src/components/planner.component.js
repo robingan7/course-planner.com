@@ -165,7 +165,7 @@ export default class Planner extends PureComponent {
   }
 
   addDefaultTime(appoint){
-    let { startDate, endDate } = appoint;
+    let { startDate, endDate } = appoint;/* date object */
     appoint.startDate = this.getCurrentDate(startDate) + "T" + DEFAULT_STARTTIME;
     appoint.endDate = this.getCurrentDate(endDate) + "T" + DEFAULT_ENDTIME;
 
@@ -179,7 +179,7 @@ export default class Planner extends PureComponent {
     return endDateNum - startDateNum;
   }
 
-  getAddDayList(appoint){
+  getAddDayList(appoint) {
     console.log(appoint);
     let duration = this.getDuration(appoint);
     let startDate = new Date(appoint.startDate);
@@ -201,6 +201,10 @@ export default class Planner extends PureComponent {
       }
       return result;
     }
+
+    appoint.startDate = startDate;
+    appoint.endDate = startDate;
+
     return [this.addDefaultTime(appoint)];
   }
 
@@ -243,6 +247,7 @@ export default class Planner extends PureComponent {
         console.log(err);
       }
     }
+    
   }
 
   appointFunc(appoint, type, index=-1) {
@@ -266,11 +271,30 @@ export default class Planner extends PureComponent {
       for(let i = 0; i < dayList.length; i++) {
         copy.splice(index + i, 0, dayList[i]);
       }
-      console.log(copy);
 
       let finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
       console.log(finalArray);
       //this.updateAppointmentsToMongo(finalArray);
+    } else if (type === "deleteSingle") {
+      let copy = this.state.appointments;
+      const isAutoAjd = appoint.isAutoAdjust;
+      copy.splice(index, 1);
+
+      let finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
+      console.log(finalArray);
+      //this.updateAppointmentsToMongo(finalArray);
+    } else if (type === "delete"){
+      if(index.length !== 0){
+        let copy = this.state.appointments;
+        const isAutoAjd = appoint.isAutoAdjust;
+        copy = copy.filter((value, indexInArr, arr) => {
+          return !index.includes(indexInArr);
+        });
+
+        let finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
+        console.log(finalArray);
+        //this.updateAppointmentsToMongo(finalArray);
+      }
     }
   }
 

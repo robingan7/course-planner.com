@@ -30,8 +30,8 @@ export default function Toast(props) {
         <div>
             <Snackbar
                 anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
+                    vertical: 'top',
+                    horizontal: 'right',
                 }}
                 open={isOpen}
                 autoHideDuration={6000}
@@ -39,7 +39,7 @@ export default function Toast(props) {
                 ContentProps={{
                     'aria-describedby': 'message-id',
                 }}
-                message={<span id="message-id">Note archived</span>}
+                message={<span id="message-id">Updated successfully!!</span>}
                 action={[
                     <Button key="undo" color="secondary" size="small" onClick={handleClose}>
                         UNDO

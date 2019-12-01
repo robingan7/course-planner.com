@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function DeleteMutipleBtn(props) {
   const classes = useStyles();
-  const numberOfPlans = props.numberOfPlans;
+  const { numberOfPlans, deleteMultiple} = props;
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = React.useState(false);
   const isBiggerThan420 = useMediaPredicate("(max-width: 420px)");
@@ -55,6 +55,10 @@ export default function DeleteMutipleBtn(props) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleDelete = () => {
+    deleteMultiple(state.isAutoAdjust);
+  }
 
   return (
     <div>
@@ -106,10 +110,11 @@ export default function DeleteMutipleBtn(props) {
                   variant="contained"
                   color="primary"
                   startIcon={<CloseIcon />}
+                  onClick={handleClose}
                 >
                   No
                 </Button>
-                <Button variant="contained" startIcon={<CheckIcon />}>
+                <Button variant="contained" startIcon={<CheckIcon />} onClick={handleDelete}>
                   Yes
                 </Button>
               </ButtonGroup>
