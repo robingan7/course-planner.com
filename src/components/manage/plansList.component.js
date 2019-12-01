@@ -27,6 +27,9 @@ const useStyles = makeStyles(theme => ({
 export default function PlansList(props) {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([0]);
+  const { appointments,
+          appointFunc,
+          resources } = props;
 
   const handleToggle = value => () => {
     const currentIndex = checked.indexOf(value);
@@ -41,13 +44,14 @@ export default function PlansList(props) {
     setChecked(newChecked);
   };
 
-  return (
-    <List className={classes.root}>
-      {props.appointments.map(appointment => {
+  const generateList = () => {
+    if (appointments.length !== 0){
+      let plansList = [];
+      let id = 0;
+      appointments.map(appointment => {
         const labelId = `checkbox-list-label-${appointment.title}`;
-
-        return (
-          <ListItem
+        plansList.push( 
+          (<ListItem
             key={appointment.title}
             role={undefined}
             dense
@@ -64,12 +68,30 @@ export default function PlansList(props) {
             </ListItemIcon>
             <ListItemText id={labelId} primary={appointment.title} />
             <ListItemSecondaryAction>
-              <EditBtn planName={appointment.title} />
+              <EditBtn id={id} planName={appointment.title} appointment={appointment} 
+                appointFunc={appointFunc}
+                resources={resources}/>
               <DeleteSingle planName={appointment.title} />
             </ListItemSecondaryAction>
-          </ListItem>
-        );
-      })}
+          </ListItem>));
+          id++;
+      });
+
+      return plansList;
+    } else {
+      return (
+      <ListItem>
+          <ListItemText key={"No plans"} primary={"No plans"} />
+      </ListItem>
+      );
+    }
+  }
+
+  return (
+    <List className={classes.root}>
+      {
+        generateList()
+      }
     </List>
   );
 }

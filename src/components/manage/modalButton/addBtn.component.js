@@ -36,12 +36,11 @@ const useStyles = makeStyles(theme => ({
 
 export default function AddBtn(props) {
   const classes = useStyles();
+  const {appointFunc, resources } = props;
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [open, setOpen] = React.useState(false);
-  const isBiggerThan420 = useMediaPredicate("(max-width: 420px)");
   const [isAutoAdjust, setIsAutoAdjust] = React.useState(true);
   const [error, setError] = React.useState("");
-
   const [startDate, setStartDate] = React.useState("");
   const [endDate, setEndDate] = React.useState("");
   const [title, setTitle] = React.useState("");
@@ -103,7 +102,7 @@ export default function AddBtn(props) {
     } else if (endDate < startDate) {
       setError("Start date should be smaller or equal to end date");
     } else {
-      props.appointFunc({
+      appointFunc({
         note: notes,
         title: title,
         endDate: endDate,
@@ -115,7 +114,7 @@ export default function AddBtn(props) {
   }
 
   let array = [];
-  props.resources.map(resource => {
+  resources.map(resource => {
     if (resource.fieldName == "period") {
       array = resource.instances;
     }
@@ -183,7 +182,7 @@ export default function AddBtn(props) {
               <Select native name="period" onChange={handleChange}>
                 <option value="" />
                 {array.map(instance => {
-                  return <option value={instance.id}>{instance.text}</option>;
+                  return <option key={instance.id} value={instance.id}>{instance.text}</option>;
                 })}
               </Select>
             </FormControl>

@@ -16,6 +16,7 @@ export default class Manage extends Component {
   
     render() {
     const {
+      appointments,
       appointFunc,
       resources
     } = this.props;
@@ -25,7 +26,10 @@ export default class Manage extends Component {
             <h1>Manage</h1>
             <div className="manageContent">
               <h2 className="subTitle">Plans</h2>
-              <PlansList appointments={this.props.appointments} />
+              <PlansList appointments={appointments} 
+                appointFunc={appointFunc}
+                resources={resources}
+              />
               <Grid item className="toolKit">
                 <ButtonGroup
                   variant="contained"

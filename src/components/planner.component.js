@@ -1,4 +1,4 @@
-import React, { Component} from "react";
+import React, { Component, PureComponent} from "react";
 import axios from "axios";
 import Cookies from "universal-cookie";
 import "../Planner.css";
@@ -9,12 +9,13 @@ import Question from "./planner/question.component";
 import Notification from "./planner/notification.component";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { BLOCKS, MAX_NUM_OF_CLASSES} from "../schedules/smchs";
+import Toast from "./planner/toast.component";
 
 const cookies = new Cookies();
 const DEFAULT_STARTTIME = "00:00";
 const DEFAULT_ENDTIME = "00:01";
 
-export default class Planner extends Component {
+export default class Planner extends PureComponent {
   constructor(props) {
     super(props);
     this.signout = this.signout.bind(this);
@@ -32,6 +33,7 @@ export default class Planner extends Component {
     this.getAppointment = this.getAppointment.bind(this);
     this.appointFunc = this.appointFunc.bind(this);
     this.updateAppointmentsToMongo = this.updateAppointmentsToMongo.bind(this);
+    this.controlToast = this.controlToast.bind(this);
 
     this.state = {
       isChecked: false,
@@ -45,9 +47,9 @@ export default class Planner extends Component {
       mainResourceName: "period",
       resources: [],
       appointments: [],
-      canEditEmail: true
+      canEditEmail: true,
+      toastOpen: false
     };
-
   }
 
   /* edit appointments methods */
@@ -60,25 +62,63 @@ export default class Planner extends Component {
 
   autoAdjust(editSchedule) {
     let resultList = [];
+    let nextStartDay;
 
     for (let i = 0; i < editSchedule.length; i++) {
       let currentAppoint = editSchedule[i]
       let currentPeriod = currentAppoint.period;
       if (currentPeriod !== "Off"){
-        let validDay = this.getValidDay(currentAppoint.startDate, 
-          resultList, i, currentPeriod);
-
-        console.log(validDay);
+        let validDay;
+        if(i === 0){
+          validDay = this.getValidDay(currentAppoint.startDate,
+            editSchedule, currentPeriod);
+        } else {
+          validDay = this.getValidDay(nextStartDay,
+            editSchedule, currentPeriod);
+        }
+        
+        nextStartDay = this.getCurrentDate(this.getNextDay(validDay)) + "T" + DEFAULT_STARTTIME;
+        console.log(validDay, nextStartDay);
         currentAppoint.startDate = validDay;
         currentAppoint.endDate = validDay;
-
         resultList.push(Object.assign({}, this.addDefaultTime(currentAppoint)));
       } else {
+        nextStartDay = this.getCurrentDate(this.getNextDay(new Date(currentAppoint.startDate))) + "T" + DEFAULT_STARTTIME;
+        console.log(nextStartDay);
         resultList.push(Object.assign({}, currentAppoint));
       }
     }
-
     return resultList;
+  }
+
+  getValidDay(date, editSchedule, period) {
+    if (!this.isONAnOffDay(date, editSchedule, period)) {
+      return new Date(date);
+    }
+    let nextDay = this.getNextDay(new Date(date));
+    return this.getValidDay(this.getCurrentDate(nextDay) + "T" + DEFAULT_STARTTIME,
+      editSchedule, period);
+  }
+
+  isONAnOffDayHelper(date, editSchedule){
+    for (let ele of editSchedule) {
+      if (ele.startDate === date && ele.period === "Off") {
+        return true;
+      }
+      if (ele.startDate > date){
+        return false;
+      }
+    }
+    return false;
+  }
+  /**add for school schedule later */
+  isONAnOffDay(date, editSchedule, period) {
+    let helpReturn = this.isONAnOffDayHelper(date, editSchedule);
+    if (!this.hasNumber(period)) {
+      return  helpReturn || this.isOnOffDayOnSMCHS(date);
+    } else {
+      return helpReturn ||this.isOnOffDayOnSMCHS(date, Number(period.slice(-1)));
+    }
   }
 
   isWeekEnd(date){
@@ -104,11 +144,10 @@ export default class Planner extends Component {
               periodList.push(8);
             } else {
               let currentPeriod = dayBlockNumber + addNum;
-
               if (currentPeriod > MAX_NUM_OF_CLASSES){
-                periodList.push(dayBlockNumber - MAX_NUM_OF_CLASSES);
+                periodList.push(currentPeriod - MAX_NUM_OF_CLASSES);
               } else {
-                periodList.push(dayBlockNumber);
+                periodList.push(currentPeriod);
               }
               addNum++;
             }
@@ -119,34 +158,6 @@ export default class Planner extends Component {
       return false;
     }
     return true;
-  }
-
-  /**add for school schedule later */
-  isONAnOffDay(date, index, resultList, period){
-    if(index !== 0){
-      if (!this.hasNumber(period)){
-        return resultList[index - 1].period === "Off"
-          || this.isOnOffDayOnSMCHS(date);
-      } else {
-        return resultList[index - 1].period === "Off"
-          || this.isOnOffDayOnSMCHS(date, Number(period.slice(-1)));
-      }
-    } else {
-      if (!this.hasNumber(period)) {
-        return this.isOnOffDayOnSMCHS(date);
-      } else {
-        return this.isOnOffDayOnSMCHS(date, Number(period.slice(-1)));
-      }
-    }
-  }
-
-  getValidDay(date, resultList, index, period) {
-    if (!this.isONAnOffDay(date, index, resultList, period )){
-      return new Date(date);
-    }
-    let nextDay = this.getNextDay(new Date(date));
-    return this.getValidDay(this.getCurrentDate(nextDay) + "T" + DEFAULT_STARTTIME, 
-                     resultList, index, period);
   }
 
   hasNumber(myString) {
@@ -169,6 +180,7 @@ export default class Planner extends Component {
   }
 
   getAddDayList(appoint){
+    console.log(appoint);
     let duration = this.getDuration(appoint);
     let startDate = new Date(appoint.startDate);
     
@@ -213,7 +225,27 @@ export default class Planner extends Component {
       });
   }
 
-  appointFunc(appoint, type) {
+  sortPossibleAdjust(arr, isAutoAjd){
+    arr.sort((a, b) => {
+      if (a.startDate > b.startDate) {
+        return 1;
+      } else if (a.startDate < b.startDate) {
+        return -1;
+      }
+      return 0;
+    });
+
+    if (isAutoAjd) {
+      try {
+        this.controlToast(true)
+        return this.autoAdjust(arr);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
+  appointFunc(appoint, type, index=-1) {
     if(type === "add") {
       let copy = this.state.appointments;
       const dayList = this.getAddDayList(appoint);
@@ -222,27 +254,31 @@ export default class Planner extends Component {
       for (let ele of dayList) {
         copy.push(ele);
       }
-      copy.sort((a, b) => { 
-        if(a.startDate > b.startDate){
-            return 1;
-        } else if (a.startDate < b.startDate){
-            return -1;
-        }
-        return 0;
-      });
-
-      if(isAutoAjd) {
-        try{
-          console.log(this.autoAdjust(copy));
-        } catch(err){
-          console.log(err);
-        }
-      }
+      
+      let finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
       //this.updateAppointmentsToMongo(copy);         
+    } else if (type === "edit"){
+      let copy = this.state.appointments;
+      const dayList = this.getAddDayList(appoint);
+      const isAutoAjd = dayList[0].isAutoAdjust;
+      copy.splice(index, 1);
+
+      for(let i = 0; i < dayList.length; i++) {
+        copy.splice(index + i, 0, dayList[i]);
+      }
+      console.log(copy);
+
+      let finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
+      console.log(finalArray);
+      //this.updateAppointmentsToMongo(finalArray);
     }
   }
 
   /* ----------------- */
+  controlToast(b){
+    this.setState({toastOpen: b});
+  }
+  
   getAppointment(idInput){
    const user = {
      id: idInput
@@ -369,7 +405,8 @@ export default class Planner extends Component {
       currentViewName,
       appointments,
       isChecked,
-      resources
+      resources,
+      toastOpen
     } = this.state;
     return (
       <React.Fragment>
@@ -434,6 +471,11 @@ export default class Planner extends Component {
             </section>
           </section>
         </div>
+
+        <Toast 
+          isOpen={toastOpen}
+          controlToast={this.controlToast}
+        />
 
         <Switch>
           <Route
