@@ -8,7 +8,7 @@ import Manage from "./planner/manage.component";
 import Question from "./planner/question.component";
 import Notification from "./planner/notification.component";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import { BLOCKS, MAX_NUM_OF_CLASSES} from "../schedules/smchs";
+import { BLOCKS, MAX_NUM_OF_CLASSES} from "../data/schedules/smchs";
 import Toast from "./planner/toast.component";
 
 const cookies = new Cookies();
@@ -251,8 +251,10 @@ export default class Planner extends PureComponent {
   }
 
   appointFunc(appoint, type, index=-1) {
+    let copy = this.state.appointments;
+    let finalArray;
+    
     if(type === "add") {
-      let copy = this.state.appointments;
       const dayList = this.getAddDayList(appoint);
       const isAutoAjd = dayList[0].isAutoAdjust;
 
@@ -260,10 +262,8 @@ export default class Planner extends PureComponent {
         copy.push(ele);
       }
       
-      let finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
-      //this.updateAppointmentsToMongo(copy);         
+      finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
     } else if (type === "edit"){
-      let copy = this.state.appointments;
       const dayList = this.getAddDayList(appoint);
       const isAutoAjd = dayList[0].isAutoAdjust;
       copy.splice(index, 1);
@@ -272,30 +272,26 @@ export default class Planner extends PureComponent {
         copy.splice(index + i, 0, dayList[i]);
       }
 
-      let finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
-      console.log(finalArray);
-      //this.updateAppointmentsToMongo(finalArray);
+      finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
+      
     } else if (type === "deleteSingle") {
-      let copy = this.state.appointments;
       const isAutoAjd = appoint.isAutoAdjust;
       copy.splice(index, 1);
 
-      let finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
-      console.log(finalArray);
-      //this.updateAppointmentsToMongo(finalArray);
+      finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
+      
     } else if (type === "delete"){
       if(index.length !== 0){
-        let copy = this.state.appointments;
         const isAutoAjd = appoint.isAutoAdjust;
         copy = copy.filter((value, indexInArr, arr) => {
           return !index.includes(indexInArr);
         });
 
-        let finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
-        console.log(finalArray);
-        //this.updateAppointmentsToMongo(finalArray);
+        finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
       }
     }
+    console.log(finalArray);
+    //this.updateAppointmentsToMongo(finalArray);
   }
 
   /* ----------------- */
@@ -351,7 +347,6 @@ export default class Planner extends PureComponent {
       for (let [key, value] of Object.entries(allCookies)) {
         if (key.indexOf("cp_") != -1) {
           cookies.remove(key);
-          console.log(key);
         }
       }
       resolve();
@@ -360,7 +355,7 @@ export default class Planner extends PureComponent {
     promise.then(res => {
       setTimeout(() => {
         window.location = "/";
-      }, 900);
+      }, 1000);
     });
   }
 
@@ -460,13 +455,13 @@ export default class Planner extends PureComponent {
             <li onClick={this.unChecked}>
               <Link to="/planner/manage">
                 <i className="fas fa-tasks icon"></i>Manage
-                <div className="tag">24</div>
+                <div className="tag">{appointments.length}</div>
               </Link>
             </li>
             <li onClick={this.unChecked}>
               <Link title="Notification" to="/planner/notification">
                 <i className="fas fa-bell icon"></i>Notification
-                <div className="tag">22</div>
+                <div className="tag">0</div>
               </Link>
             </li>
             <li onClick={this.unChecked}>

@@ -103,12 +103,14 @@ function signupHelper(req, res, isGoogle){
       const date = Date.parse(req.body.date);
 
       const schedule = JSON.stringify([]).trim();
+      const blocks = schedule;
+      const textbooks = schedule;
       const resources = JSON.stringify([
         {
           fieldName: "period",
           title: "Period",
           instances: [
-            { id: "Default_Class", text: "Default Class" },
+            { id: "Default Class", text: "Default Class" },
             { id: "Off", text: "Off" }
           ]
         }
@@ -121,7 +123,9 @@ function signupHelper(req, res, isGoogle){
         loginType,
         date,
         schedule,
-        resources
+        resources,
+        blocks,
+        textbooks
       });
 
       if (isGoogle) {
@@ -135,6 +139,8 @@ function signupHelper(req, res, isGoogle){
           date,
           schedule,
           resources,
+          blocks,
+          textbooks,
           googleId,
           imageUrl
         });

@@ -12,7 +12,9 @@ const signupSchema = new Schema(
     googleId: { type: String, required: false },
     imageUrl: { type: String, required: false },
     schedule: { type: String, required: true },
-    resources: { type: String, required: true }
+    resources: { type: String, required: true },
+    blocks: { type: String, required: true },
+    textbooks: { type: String, required: true }
   },
   {
     timestamps: true

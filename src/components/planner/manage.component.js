@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PlansList from "../manage/plansList.component";
-import BlocksAndSche from "../manage/blocksAndSchedule.component";
 import AddBtn from "../manage/modalButton/addBtn.component";
 import DeleteMutipleBtn from "../manage/modalButton/deleteMutiple.component";
 import Grid from "@material-ui/core/Grid";
@@ -8,7 +7,7 @@ import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddIcon from "@material-ui/icons/Add";
-
+import Imports from "../manage/imports.component";
 export default class Manage extends Component {
   constructor(props) {
     super(props);
@@ -59,8 +58,8 @@ export default class Manage extends Component {
                   <DeleteMutipleBtn numberOfPlans={this.state.deleteList.length} deleteMultiple={this.deleteMultiple}/>
                 </ButtonGroup>
               </Grid>
-              <h2 className="subTitle">Blocks & Textbook</h2>
-              <BlocksAndSche />
+              <h2 className="subTitle">Imports</h2>
+              <Imports />
             </div>
           </div>
         );
