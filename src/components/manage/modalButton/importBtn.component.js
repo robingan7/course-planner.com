@@ -13,7 +13,8 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import "react-day-picker/lib/style.css";
 import ListItem from '@material-ui/core/ListItem';
-import SelectChapterBtn from './import/selectChapters.component'
+import SelectChapterBtn from './import/selectChapters.component';
+
 const useStyles = makeStyles(theme => ({
     modalInput: {
         width: 209,
@@ -41,8 +42,6 @@ export default function ImportBtn(props) {
     const [error, setError] = React.useState("");
     const [startDate, setStartDate] = React.useState("");
     const [period, setPeriod] = React.useState("");
-    const [pacing, setPacing] = React.useState("");
-    const [textbook, setTextbook] = React.useState("");
 
     const handleChangeSwitch = name => event => {
         setIsAutoAdjust( event.target.checked );
@@ -63,13 +62,7 @@ export default function ImportBtn(props) {
 
         switch (name) {
             case 'period':
-            setPeriod(value);
-            break;
-            case 'textbook':
-                setTextbook(value);
-                break;
-            case 'pacing':
-                setPacing(value);
+                setPeriod(value);
                 break;
             default:
                 console.log('invalid name');
@@ -160,29 +153,8 @@ export default function ImportBtn(props) {
                     })}
                 </Select>
                 </FormControl>
-
-                <FormControl className={classes.modalInput}>
-                <InputLabel id="demo-simple-select-label">Pacing</InputLabel>
-                <Select native name="pacing" onChange={handleChange}>
-                    <option value="" />
-                    <option key={0} value="basic">Basic</option>
-                    <option key={1} value="general">General</option>
-                    <option key={2} value="advanced">Advanced</option>
-                    <option key={3} value="heavy_lab">Heavy Lab</option>
-                </Select>
-                </FormControl>
-
-                <FormControl className={classes.modalInput}>
-                <InputLabel id="demo-simple-select-label">Textbook</InputLabel>
-                <Select native name="textbook" onChange={handleChange}>
-                    <option value="" />
-                    {textbooks.map(instance => {
-                        return <option key={instance} value={instance}>{instance}</option>;
-                    })}
-                </Select>
-                </FormControl>
-
-                <SelectChapterBtn textbook={textbook} />
+            
+                <SelectChapterBtn textbooks={textbooks}/>
             
                 <FormControlLabel
                 control={

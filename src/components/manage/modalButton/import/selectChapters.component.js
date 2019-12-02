@@ -6,48 +6,53 @@ import Grid from "@material-ui/core/Grid";
 import PublishIcon from '@material-ui/icons/Publish';
 import CancelIcon from "@material-ui/icons/Cancel";
 import "react-day-picker/lib/style.css";
-import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import Checkbox from '@material-ui/core/Checkbox';
-import BookIcon from '@material-ui/icons/Book';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import IconButton from '@material-ui/core/IconButton';
-import BookmarksIcon from '@material-ui/icons/Bookmarks';
 import {TEXTBOOKS} from "../../../../data/textbook";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
+import ChapterSelector from "./table.component";
+import SearchIcon from "@material-ui/icons/Search";
+import TextField from "@material-ui/core/TextField";
 
 const useStyles = makeStyles(theme => ({
-    modalInput: {
-        width: 209,
-        marginLeft: "calc(50% - 104.5px)",
-        marginBottom: 15
-    },
-    modalBtn: {
-        width: 100,
-        marginLeft: "calc(50% - 50px)",
-        marginBottom: 15
-    },
-    form: {
-        padding: 0,
-        display: "inline"
-    },
-    root: {
-        width: '100%',
-        maxWidth: 360,
-        backgroundColor: theme.palette.background.paper,
-        margin:"0px auto",
-        height:450,
-        overflow:"auto",
-        marginBottom:10,
-        boxShadow: "0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)"
-    },
-    nested: {
-        paddingLeft: theme.spacing(4),
-    }
+  modalInput: {
+    width: 209,
+    marginLeft: "calc(50% - 104.5px)",
+    marginBottom: 15
+  },
+  marginn: {
+    marginLeft: 10,
+    minWidth: 90,
+    marginBottom: 5
+  },
+  modalInputBig: {
+    width: 309,
+    marginLeft: "calc(50% - 104.5px)",
+    marginBottom: 15
+  },
+  modalBtn: {
+    width: 100,
+    marginLeft: "calc(50% - 50px)",
+    marginBottom: 15
+  },
+  form: {
+    padding: 0,
+    display: "inline"
+  },
+  root: {
+    width: "100%",
+    maxWidth: 860,
+    backgroundColor: theme.palette.background.paper,
+    margin: "0px auto",
+    height: 400,
+    overflow: "auto",
+    marginBottom: 10,
+    boxShadow: "0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)"
+  },
+  nested: {
+    paddingLeft: theme.spacing(4)
+  }
 }));
 
 function ListItemLink(props) {
@@ -55,15 +60,18 @@ function ListItemLink(props) {
 }
 
 export default function SelectChapterBtn(props) {
-  const classes = useStyles();
-  // getModalStyle is not a pure function, we roll the style only on the first render
+    const classes = useStyles();
+    // getModalStyle is not a pure function, we roll the style only on the first render
     const [open, setOpen] = React.useState(false);
     const [openC, setOpenC] = React.useState({});
     const [openCC, setOpenCC] = React.useState(false);
     const [error, setError] = React.useState("");
-    const { textbook } = props;
-    
-    const [currentTextbook, setCurrentTextbook] = React.useState(TEXTBOOKS[textbook]);
+    const [textbook, setTextbook] = React.useState("");
+    const [chapters, setChapters] = React.useState([]);
+    const [pacing, setPacing] = React.useState("");
+    const [chapter, setChapter] = React.useState("");
+    const { textbooks} = props;
+    const [currentTextbook, setCurrentTextbook] = React.useState([]);
 
     const handleOpen = () => {
         setOpen(true);
@@ -77,160 +85,134 @@ export default function SelectChapterBtn(props) {
         return true;
     }
 
-    const handleClick2 = event => {
-        let name = "Ch.1 Science of Physics";
-        let old = !openC[name];
-        openC[name] = old;
-        console.log(openC);
-        setOpenC(openC);
-    };
+    const handleChange = (e) => {
+        const {
+            target: { name, value }
+        } = e;
 
-    const handleClick = event => {
-        console.log("object");
-        setOpenCC(!openCC);
-    };
+        switch (name) {
+          case "textbook":
+            setTextbook(value);
+            let textbookJson = TEXTBOOKS[value];
+            if (TEXTBOOKS[value] == undefined) {
+              textbookJson = [];
+            }
+            setCurrentTextbook(textbookJson);
+            let list = [];
+            for (let ele of textbookJson) {
+              list.push(ele.chapterName);
+            }
 
-    const renderFinish = (arr) => {
-        setTimeout(() => {
-            setOpenC(arr);
-            console.log(arr);
-        }, 1000);
-    }
-
-    const checkChange = event => {
-        console.log(event.target.name);
-    }
-
-    const formatTextbook = () => {
-        if (textbook.length === 0){
-            return (
-                <ListItem>
-                    <ListItemIcon>
-                        <Checkbox
-                            edge="start"
-                            checked={false}
-                            tabIndex={-1}
-                            disableRipple
-                            inputProps={{ 'aria-labelledby': 0 }}
-                        />
-                    </ListItemIcon>
-                    <ListItemText primary="Select a textbook first" />
-                    <ListItemSecondaryAction>
-                        <IconButton edge="end" aria-label="comments">
-                            <BookIcon />
-                        </IconButton>
-                    </ListItemSecondaryAction>
-                </ListItem>
-            );
+            setChapters(list);
+            break;
+          case "chapter":
+            setChapter(value);
+            break;
+          case "pacing":
+            setPacing(value);
+            break;
+          default:
+            console.log("invalid name");
         }
-
-        let book = TEXTBOOKS[textbook];
-        let buffer = [];
-        let copyC = openC;
-        for (let ele of book) {
-            openC[ele.chapterName] = false
-            copyC[ele.chapterName] = false
-            buffer.push((<ListItem key={ele.chapterName} >
-                <ListItemIcon>
-                    <Checkbox
-                        edge="start"
-                        tabIndex={-1}
-                        disableRipple
-                        inputProps={{ 'aria-labelledby': 0 }}
-                        onChange={checkChange}
-                        name="main"
-                    />
-                </ListItemIcon>
-                <ListItemText primary={ele.chapterName} />
-                <ListItemSecondaryAction>
-                    <IconButton edge="end" aria-label="comments" onClick={handleClick} >
-                        {openCC? <ExpandLess /> : <ExpandMore />}
-                    </IconButton>
-                </ListItemSecondaryAction>
-            </ListItem>
-            ));
-            
-            ele.subChapter.map(chapter => {
-                buffer.push((
-                    <Collapse in={openCC} timeout="auto" unmountOnExit key={chapter.chapterName + "Collapse"} >
-                        <ListItem className={classes.nested} id={chapter.chapterName}>
-                            <ListItemIcon>
-                                <Checkbox
-                                    edge="start"
-                                    tabIndex={-1}
-                                    disableRipple
-                                    inputProps={{ 'aria-labelledby': 1 }}
-                                    value={chapter.chapterName}
-                                    onChange={checkChange}
-                                    name="sub"
-                                />
-                            </ListItemIcon>
-                            <ListItemText primary={chapter.chapterName} />
-                            <ListItemSecondaryAction>
-                                <IconButton edge="end" aria-label="comments">
-                                    <BookmarksIcon />
-                                </IconButton>
-                                
-                            </ListItemSecondaryAction>
-                        </ListItem>
-                    </Collapse>
-                ));
-            })
-        }
-
-        renderFinish(copyC);
-        return buffer;
     }
 
     return (
-        <div>
+      <div>
         <Button
-            type="button"
-            onClick={handleOpen}
-            variant="contained"
-            color="default"
-            startIcon={<PublishIcon />}
+          type="button"
+          onClick={handleOpen}
+          variant="contained"
+          color="default"
+          startIcon={<PublishIcon />}
         >
-            0 Chapters Selected
+          0 Chapters Selected
         </Button>
         <Modal
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-            open={open}
-            onClose={handleClose}
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
+          open={open}
+          onClose={handleClose}
         >
-            <div className="modalBody">
+          <div className="modalBody modalTable">
             <Grid item className="closeIconGrid">
-                <CancelIcon className="closeIcon" onClick={handleClose} />
+              <CancelIcon className="closeIcon" onClick={handleClose} />
             </Grid>
             <h2 id="simple-modal-title" className="modalTitle">
-                Select Chapters from <span className="planName">{textbook}</span>
+              Chapter Selector
             </h2>
 
             <h3 className="modalError">{error}</h3>
+            <FormControl className={classes.marginn}>
+              <InputLabel id="demo-simple-select-label">Textbook</InputLabel>
+              <Select native name="textbook" onChange={handleChange}>
+                <option value="" />
+                {textbooks.map(instance => {
+                  return (
+                    <option key={instance} value={instance}>
+                      {instance}
+                    </option>
+                  );
+                })}
+              </Select>
+            </FormControl>
+
+            <FormControl className={classes.marginn}>
+              <InputLabel id="demo-simple-select-label">Chapters</InputLabel>
+              <Select native name="chapter" onChange={handleChange}>
+                <option value="" />
+                {chapters.map(instance => {
+                  return (
+                    <option key={instance} value={instance}>
+                      {instance}
+                    </option>
+                  );
+                })}
+              </Select>
+            </FormControl>
+
+            <FormControl className={classes.marginn}>
+              <InputLabel id="demo-simple-select-label">Pacing</InputLabel>
+              <Select native name="pacing" onChange={handleChange}>
+                <option value="" />
+                <option key={0} value="basic">
+                  Basic
+                </option>
+                <option key={1} value="general">
+                  General
+                </option>
+                <option key={2} value="advanced">
+                  Advanced
+                </option>
+                <option key={3} value="heavy_lab">
+                  Heavy Lab
+                </option>
+              </Select>
+            </FormControl>
+
+            <FormControl className={classes.marginn}>
+              <Grid container alignItems="flex-end">
+                <Grid item>
+                  <SearchIcon />
+                </Grid>
+                <Grid item>
+                  <TextField id="input-with-icon-grid" label="Search" />
+                </Grid>
+              </Grid>
+            </FormControl>
 
             <form className={classes.form}>
-                <List
-                component="nav"
-                aria-labelledby="nested-list-subheader"
-                className={classes.root}
-                >
-                   {
-                        formatTextbook()
-                    }
-                </List>
-
-                <Button
+              <ChapterSelector />
+              <Button
                 variant="contained"
                 color="primary"
                 className={classes.modalBtn}
                 startIcon={<PublishIcon />}
-                >
+              >
                 Select
-                </Button>
+              </Button>
             </form>
-            </div>
+          </div>
         </Modal>
-        </div>
+      </div>
     );
 }

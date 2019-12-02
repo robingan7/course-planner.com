@@ -554,6 +554,18 @@ label.hamburger {
   padding:10px;
 }
 
+.modalTable{
+  top:69px;
+  left:calc(50% - 310px);
+  width:600px;
+}
+
+@media(max-width:620px){
+  .modalTable{
+    left:5px;
+    width:calc(100% - 30px);
+  }
+}
 @media(min-width:420px) AND (max-height:750px){
   .modalBody{
     top:10px;
@@ -577,6 +589,10 @@ label.hamburger {
 .MuiListItem-root{
   padding-top:2.5px!important;
   padding-bottom: 2.5px!important;
+}
+
+.tableHead{
+  height:20px;
 }
 /*not used
 
