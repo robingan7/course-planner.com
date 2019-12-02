@@ -15,7 +15,7 @@ import SaveIcon from '@material-ui/icons/Save';
 
 const useStyles = makeStyles(theme => ({
     formControl: {
-        marginTop:-5,
+        marginTop:5,
         marginRight:5,
         minWidth: 120,
         maxWidth: 300,
@@ -32,7 +32,8 @@ const useStyles = makeStyles(theme => ({
     },
     saveButton: {
         marginTop: 5,
-        marginBottom:10
+        marginBottom:10,
+        marginLeft:12
     }
 }));
 
@@ -60,13 +61,12 @@ function getStyles(name, blockOptions, theme) {
     };
 }
 
-export default function Imports() {
+export default function Imports(props) {
     const classes = useStyles();
     const theme = useTheme();
-    const [blockOptions, setBlockOptions] = React.useState([]);
-    const [textbookOptions, setTextbookOptions] = React.useState([]);
-    const [periodOptions, setPeriodOptions] = React.useState([]);
-
+    const { blockOption, textbookOption, updateImports, resources} = props;
+    const [blockOptions, setBlockOptions] = React.useState(blockOption);
+    const [textbookOptions, setTextbookOptions] = React.useState(textbookOption);
     const handleChange = name => event => {
         switch (name) {
             case "block":
@@ -94,8 +94,54 @@ export default function Imports() {
         setBlockOptions(value);
     };
 
+    const handleUpdate = () => {
+        let copy = resources;
+        let newInstacnes = [
+            { id: "Default Class", text: "Default Class" }, 
+            { id: "Off", text: "Off" }
+        ];
+
+        for (let ele of periodOptions) {
+            newInstacnes.push({
+                id: ele, 
+                text: ele
+            });
+        }
+
+        copy[getPeriodIndex(copy)].instances = newInstacnes;
+        let output = {
+            blocks: blockOptions,
+            textbooks: textbookOptions,
+            periods: copy
+        }
+
+        updateImports(output);
+    }
+
+    const getPeriodIndex = arr => {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i].fieldName === "period") {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    const filterPeriod = p => {
+        p = p.filter(period => period.id !== "Off" && period.id !== "Default Class");
+        let resultOptions = [];
+
+        for(let ele of p) {
+            resultOptions.push(ele.id);
+        }
+        return resultOptions;
+    };
+
+    const [periodOptions, setPeriodOptions] = React.useState(filterPeriod(resources[getPeriodIndex(resources)].instances));
+
     return (
         <React.Fragment>
+            <div style={{marginLeft:12}}>
             <FormControl className={classes.formControl}>
                 <InputLabel id="demo-mutiple-chip-label">Blocks</InputLabel>
                 <Select
@@ -173,13 +219,14 @@ export default function Imports() {
                     ))}
                 </Select>
             </FormControl>
-            <br/>
+            </div>
             <Button
                 variant="contained"
                 color="primary"
                 size="small"
                 className={classes.saveButton}
                 startIcon={<SaveIcon />}
+                onClick={handleUpdate}
             >
                 Save
             </Button>

@@ -18,9 +18,11 @@ const useStyles = makeStyles(theme => ({
     maxWidth: 360,
     backgroundColor: '#fff',
     marginLeft:'10px',
-    height:'400px',
+    height:'auto',
     overflow: 'auto',
-    boxShadow: "0 18px 28px rgba(0,0,0,0.35), 0 10px 20px rgba(0,0,0,0.32)"
+    boxShadow: "0 18px 28px rgba(0,0,0,0.35), 0 10px 20px rgba(0,0,0,0.32)",
+    paddingTop: 10,
+    paddingBottom: 10,
   }
 }));
 
@@ -69,10 +71,9 @@ export default function PlansList(props) {
         const labelId = `checkbox-list-label-${appointment.title}`;
         plansList.push( 
           (<ListItem
-            key={appointment.title}
+            key={id}
             role={undefined}
             dense
-            button
             onClick={handleToggle(appointment.title)}
           >
             <ListItemIcon>

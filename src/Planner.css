@@ -476,6 +476,10 @@ label.hamburger {
   border-bottom: 2px solid black;
 }
 
+.subTitleImport{
+  margin-bottom:-3px;
+}
+
 .manageContent{
   width:450px;
   margin: 0 auto;
@@ -495,6 +499,7 @@ label.hamburger {
   text-align: center;
   margin-bottom:5px;
   font-size:22px;
+  margin-top:25px;
 }
 
 .DayPickerInput-OverlayWrapper{
@@ -567,6 +572,11 @@ label.hamburger {
 .planName{
   font-size:22px;
   text-decoration: underline;
+}
+
+.MuiListItem-root{
+  padding-top:2.5px!important;
+  padding-bottom: 2.5px!important;
 }
 /*not used
 

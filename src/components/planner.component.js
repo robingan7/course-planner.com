@@ -33,6 +33,7 @@ export default class Planner extends PureComponent {
     this.getAppointment = this.getAppointment.bind(this);
     this.appointFunc = this.appointFunc.bind(this);
     this.updateAppointmentsToMongo = this.updateAppointmentsToMongo.bind(this);
+    this.updateImports = this.updateImports.bind(this);
     this.controlToast = this.controlToast.bind(this);
 
     this.state = {
@@ -45,7 +46,9 @@ export default class Planner extends PureComponent {
       currentDate: this.getCurrentDate(new Date()),
       currentViewName: "Month",
       mainResourceName: "period",
-      resources: [],
+      resources: [{ "fieldName": "period", "title": "Period", "instances": [{ "id": "Default Class", "text": "Default Class" }, { "id": "Off", "text": "Off" }]}],
+      textbooks:[],
+      blocks:[],
       appointments: [],
       canEditEmail: true,
       toastOpen: false
@@ -71,10 +74,10 @@ export default class Planner extends PureComponent {
         let validDay;
         if(i === 0){
           validDay = this.getValidDay(currentAppoint.startDate,
-            editSchedule, currentPeriod);
+            editSchedule, currentPeriod, resultList);
         } else {
           validDay = this.getValidDay(nextStartDay,
-            editSchedule, currentPeriod);
+            editSchedule, currentPeriod, resultList);
         }
         
         nextStartDay = this.getCurrentDate(this.getNextDay(validDay)) + "T" + DEFAULT_STARTTIME;
@@ -91,29 +94,36 @@ export default class Planner extends PureComponent {
     return resultList;
   }
 
-  getValidDay(date, editSchedule, period) {
-    if (!this.isONAnOffDay(date, editSchedule, period)) {
+  getValidDay(date, editSchedule, period, resultList) {
+    if (!this.isONAnOffDay(date, editSchedule, period, resultList)) {
       return new Date(date);
     }
     let nextDay = this.getNextDay(new Date(date));
     return this.getValidDay(this.getCurrentDate(nextDay) + "T" + DEFAULT_STARTTIME,
-      editSchedule, period);
+      editSchedule, period, resultList);
   }
 
-  isONAnOffDayHelper(date, editSchedule){
+  isONAnOffDayHelper(date, editSchedule, period, resultList){
+    for (let ele of resultList) {
+      if (ele.startDate === date && (ele.period === "Off" || ele.period === period)) {
+        return true;
+      }
+    }
+
     for (let ele of editSchedule) {
       if (ele.startDate === date && ele.period === "Off") {
         return true;
       }
-      if (ele.startDate > date){
-        return false;
+      if (ele.startDate > date) {
+        break;
       }
     }
     return false;
   }
+
   /**add for school schedule later */
-  isONAnOffDay(date, editSchedule, period) {
-    let helpReturn = this.isONAnOffDayHelper(date, editSchedule);
+  isONAnOffDay(date, editSchedule, period, resultList) {
+    let helpReturn = this.isONAnOffDayHelper(date, editSchedule, period, resultList);
     if (!this.hasNumber(period)) {
       return  helpReturn || this.isOnOffDayOnSMCHS(date);
     } else {
@@ -153,7 +163,7 @@ export default class Planner extends PureComponent {
             }
           }
         }
-        return !periodList.includes((Number(period.slice(-1))));
+        return !periodList.includes((Number(period)));
       }
       return false;
     }
@@ -180,7 +190,6 @@ export default class Planner extends PureComponent {
   }
 
   getAddDayList(appoint) {
-    console.log(appoint);
     let duration = this.getDuration(appoint);
     let startDate = new Date(appoint.startDate);
     
@@ -190,7 +199,6 @@ export default class Planner extends PureComponent {
       appoint.startDate = startDate;
       appoint.endDate = appoint.startDate;
       let result = [Object.assign({}, this.addDefaultTime(appoint))];
-
       for (let i = 0; i < duration; i++) {
         newDate = this.getNextDay(newDate);
         appoint.startDate = newDate;
@@ -261,7 +269,6 @@ export default class Planner extends PureComponent {
       for (let ele of dayList) {
         copy.push(ele);
       }
-      
       finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
     } else if (type === "edit"){
       const dayList = this.getAddDayList(appoint);
@@ -290,11 +297,50 @@ export default class Planner extends PureComponent {
         finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
       }
     }
+
+    finalArray.sort((a, b) => {
+      if (a.startDate > b.startDate) {
+        return 1;
+      } else if (a.startDate < b.startDate) {
+        return -1;
+      }
+      return 0;
+    });
     console.log(finalArray);
     //this.updateAppointmentsToMongo(finalArray);
   }
 
   /* ----------------- */
+
+  updateImports(appoint) {
+    const user = {
+      filter: {
+        _id: this.state.id
+      },
+      update: {
+        blocks: JSON.stringify(appoint.blocks),
+        textbooks: JSON.stringify(appoint.textbooks),
+        resources: JSON.stringify(appoint.periods)
+      }
+    };
+
+    axios
+      .post(this.props.serverLink + "/signup-login/update", user)
+      .then(res => {
+        const updated = {
+          blocks: JSON.parse(res.data.info.blocks),
+          textbooks: JSON.parse(res.data.info.textbooks),
+          resources: JSON.parse(res.data.info.resources)
+        };
+
+        this.setState(updated);
+        this.controlToast(true);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
   controlToast(b){
     this.setState({toastOpen: b});
   }
@@ -309,11 +355,11 @@ export default class Planner extends PureComponent {
         if (res.data.message == "Got it!") {
           this.setState({
             appointments: res.data.schedule,
-            resources: res.data.resources
+            resources: res.data.resources,
+            blocks: res.data.blocks,
+            textbooks: res.data.textbooks
           });
-
         }
-        //console.log(res.data.schedule, res.data.resources);
       })
       .catch(err => {
         console.log("error in getAppointment()");
@@ -398,9 +444,6 @@ export default class Planner extends PureComponent {
     this.setState({
       [name]: value
     });
-    console.log({
-      [name]: value
-    });
   }
 
   onUpdateFromSettings(res) {
@@ -425,7 +468,9 @@ export default class Planner extends PureComponent {
       appointments,
       isChecked,
       resources,
-      toastOpen
+      toastOpen,
+      blocks,
+      textbooks
     } = this.state;
     return (
       <React.Fragment>
@@ -544,6 +589,9 @@ export default class Planner extends PureComponent {
                 appointments={appointments}
                 appointFunc={this.appointFunc}
                 resources={resources}
+                blocks={blocks}
+                textbooks={textbooks}
+                updateImports={this.updateImports}
               />
             )}
           />

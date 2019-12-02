@@ -34,7 +34,7 @@ export default function Toast(props) {
                     horizontal: 'right',
                 }}
                 open={isOpen}
-                autoHideDuration={6000}
+                autoHideDuration={2000}
                 onClose={handleClose}
                 ContentProps={{
                     'aria-describedby': 'message-id',

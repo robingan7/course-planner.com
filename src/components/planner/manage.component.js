@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PlansList from "../manage/plansList.component";
 import AddBtn from "../manage/modalButton/addBtn.component";
 import DeleteMutipleBtn from "../manage/modalButton/deleteMutiple.component";
+import ImportBtn from "../manage/modalButton/importBtn.component";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
@@ -30,7 +31,10 @@ export default class Manage extends Component {
     const {
       appointments,
       appointFunc,
-      resources
+      resources,
+      blocks,
+      textbooks,
+      updateImports
     } = this.props;
 
         return (
@@ -55,11 +59,16 @@ export default class Manage extends Component {
                     appointFunc={appointFunc}
                     resources={resources}
                   />
+                  <ImportBtn 
+                    appointFunc={appointFunc}
+                    resources={resources}
+                    textbooks={textbooks}
+                  />
                   <DeleteMutipleBtn numberOfPlans={this.state.deleteList.length} deleteMultiple={this.deleteMultiple}/>
                 </ButtonGroup>
               </Grid>
-              <h2 className="subTitle">Imports</h2>
-              <Imports />
+              <h2 className="subTitle subTitleImport">Imports</h2>
+              <Imports resources={resources} blockOption={blocks} textbookOption={textbooks} updateImports={updateImports}/>
             </div>
           </div>
         );

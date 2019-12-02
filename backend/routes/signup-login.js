@@ -18,6 +18,8 @@ router.route("/getAppointment").post(async (req, res) => {
     let callback = { message: "Got it!" };
     callback.schedule = JSON.parse(user.schedule);
     callback.resources = JSON.parse(user.resources);
+    callback.textbooks = JSON.parse(user.textbooks);
+    callback.blocks = JSON.parse(user.blocks);
     res.send(callback);
   } catch (error) {
     res.status(500).send(error);
