@@ -15,6 +15,31 @@ import ChapterSelector from "./table.component";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 
+function sendChapter(n) {
+  if(n === ""){
+    return "All";
+  }
+  return n;
+} 
+
+function createData(chapterName, basic, general, advanced, heavy_lab) {
+  return { chapterName, basic, general, advanced, heavy_lab };
+}
+
+function createRows(arr, chapter = "") {
+  let result = [];
+  for (let ele of arr) {
+    if (chapter === "" || (chapter !== "" && ele.chapterName === chapter)) {
+      for (let ele2 of ele.subChapter) {
+        let row = createData(ele2.chapterName, ele2.basic, ele2.general, ele2.advanced,
+          ele2.heavy_lab);
+        result.push(row);
+      }
+    }
+  }
+  return result;
+}
+
 const useStyles = makeStyles(theme => ({
   modalInput: {
     width: 209,
@@ -24,6 +49,11 @@ const useStyles = makeStyles(theme => ({
   marginn: {
     marginLeft: 10,
     minWidth: 90,
+    marginBottom: 5
+  },
+  marginnBigger: {
+    marginLeft: 10,
+    minWidth: 220,
     marginBottom: 5
   },
   modalInputBig: {
@@ -70,12 +100,21 @@ export default function SelectChapterBtn(props) {
     const [chapters, setChapters] = React.useState([]);
     const [pacing, setPacing] = React.useState("");
     const [chapter, setChapter] = React.useState("");
-    const { textbooks} = props;
+    const { textbooks } = props;
     const [currentTextbook, setCurrentTextbook] = React.useState([]);
+    const [rows, setRows] = React.useState([]);
+    const [rowsPerPage, setRowsPerPage] = React.useState(20);
 
     const handleOpen = () => {
         setOpen(true);
     };
+
+    const sendRowNum = arr => {
+      if (arr.length >= 20 || arr.length === 0) {
+        return 20;
+      }
+      return arr.length;
+    }
 
     const handleClose = () => {
         setOpen(false);
@@ -104,9 +143,18 @@ export default function SelectChapterBtn(props) {
             }
 
             setChapters(list);
+            let rowsNew = createRows(textbookJson, chapter);
+            setRows(rowsNew);
+            setRowsPerPage(sendRowNum(rowsNew));
+            if (value === "") {
+              setChapter("");
+            }
             break;
           case "chapter":
             setChapter(value);
+            let rowsNew2 = createRows(currentTextbook, value);
+            setRows(rowsNew2);
+            setRowsPerPage(sendRowNum(rowsNew2));
             break;
           case "pacing":
             setPacing(value);
@@ -144,7 +192,7 @@ export default function SelectChapterBtn(props) {
             <h3 className="modalError">{error}</h3>
             <FormControl className={classes.marginn}>
               <InputLabel id="demo-simple-select-label">Textbook</InputLabel>
-              <Select native name="textbook" onChange={handleChange}>
+              <Select native name="textbook" onChange={handleChange} value={textbook}>
                 <option value="" />
                 {textbooks.map(instance => {
                   return (
@@ -156,9 +204,9 @@ export default function SelectChapterBtn(props) {
               </Select>
             </FormControl>
 
-            <FormControl className={classes.marginn}>
+            <FormControl className={classes.marginnBigger}>
               <InputLabel id="demo-simple-select-label">Chapters</InputLabel>
-              <Select native name="chapter" onChange={handleChange}>
+              <Select native name="chapter" value={chapter} onChange={handleChange}>
                 <option value="" />
                 {chapters.map(instance => {
                   return (
@@ -172,7 +220,7 @@ export default function SelectChapterBtn(props) {
 
             <FormControl className={classes.marginn}>
               <InputLabel id="demo-simple-select-label">Pacing</InputLabel>
-              <Select native name="pacing" onChange={handleChange}>
+              <Select native name="pacing" onChange={handleChange} value={pacing}>
                 <option value="" />
                 <option key={0} value="basic">
                   Basic
@@ -201,7 +249,9 @@ export default function SelectChapterBtn(props) {
             </FormControl>
 
             <form className={classes.form}>
-              <ChapterSelector />
+              <ChapterSelector rows={rows} chapter={sendChapter(chapter)} rowsPerPage={rowsPerPage} 
+                setRowsPerPage={setRowsPerPage}
+              />
               <Button
                 variant="contained"
                 color="primary"

@@ -552,10 +552,11 @@ label.hamburger {
   overflow:auto;
   background-color: #fff;
   padding:10px;
+  min-height: 450px;
 }
 
 .modalTable{
-  top:69px;
+  top:40px;
   left:calc(50% - 310px);
   width:600px;
 }
@@ -593,6 +594,19 @@ label.hamburger {
 
 .tableHead{
   height:20px;
+}
+
+.MuiTableCell-sizeSmall{
+  padding-left:5px!important;
+  padding-right:10px!important;
+}
+
+.MuiTableCell-alignRight {
+  width:95px; 
+}
+
+.MuiTableCell-paddingNone{
+  width:140px;
 }
 /*not used
 
