@@ -14,6 +14,7 @@ import Switch from "@material-ui/core/Switch";
 import "react-day-picker/lib/style.css";
 import ListItem from '@material-ui/core/ListItem';
 import SelectChapterBtn from './import/selectChapters.component';
+import Preview from './import/preview.component';
 
 const useStyles = makeStyles(theme => ({
     modalInput: {
@@ -42,6 +43,10 @@ export default function ImportBtn(props) {
     const [error, setError] = React.useState("");
     const [startDate, setStartDate] = React.useState("");
     const [period, setPeriod] = React.useState("");
+    const [selected, setSelected] = React.useState([]);
+    const [searchInput, setSearchInput] = React.useState("");
+    const [pacing, setPacing] = React.useState("");
+    const [preview, setPreview] = React.useState(true);
 
     const handleChangeSwitch = name => event => {
         setIsAutoAdjust( event.target.checked );
@@ -80,12 +85,16 @@ export default function ImportBtn(props) {
     };
 
     const isFullFilled = () => {
-        return true;
+        return startDate !== "" && period !== "" && selected.length !== 0 && pacing !== "";
+    }
+
+    const closePreview = () => {
+        setPreview(false);
     }
 
     const addAppoint = () => {
         if (!isFullFilled()) {
-        setError( "Please fill in all the fields" );
+            setError( "Please fill in all the fields" );
         } else {
             /*
         appointFunc({
@@ -154,8 +163,12 @@ export default function ImportBtn(props) {
                 </Select>
                 </FormControl>
             
-                <SelectChapterBtn textbooks={textbooks}/>
-            
+                <SelectChapterBtn textbooks={textbooks} selected={selected} setSelected={setSelected} searchInput={searchInput}
+                            setSearchInput={setSearchInput} pacing={pacing} setPacing={setPacing}
+                />
+
+                <Preview open={preview} handleClose={closePreview}/>
+                    
                 <FormControlLabel
                 control={
                     <Switch

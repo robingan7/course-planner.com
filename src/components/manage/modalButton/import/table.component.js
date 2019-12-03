@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { lighten, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -15,9 +15,6 @@ import Paper from "@material-ui/core/Paper";
 import Checkbox from "@material-ui/core/Checkbox";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
-import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 
@@ -45,6 +42,10 @@ function getSorting(order, orderBy) {
   return order === "desc"
     ? (a, b) => desc(a, b, orderBy)
     : (a, b) => -desc(a, b, orderBy);
+}
+
+function createId(row) {
+  return [row.chapterName, row.basic, row.general, row.advanced, row.heavy_lab].join('_');
 }
 
 const headCells = [
@@ -165,20 +166,6 @@ const EnhancedTableToolbar = props => {
             {chapter}
         </Typography>
       )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="add">
-          <IconButton aria-label="add">
-            <AddCircleIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton aria-label="filter list">
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
     </Toolbar>
   );
 };
@@ -219,10 +206,9 @@ const useStyles = makeStyles(theme => ({
 
 export default function ChapterSelector(props) {
   const classes = useStyles();
-  const { rows, chapter, setRowsPerPage, rowsPerPage} = props;
+  const { rows, chapter, setRowsPerPage, rowsPerPage, selected, setSelected} = props;
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("chapterName");
-  const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
   const handleRequestSort = (event, property) => {
@@ -233,7 +219,7 @@ export default function ChapterSelector(props) {
 
   const handleSelectAllClick = event => {
     if (event.target.checked) {
-      const newSelecteds = rows.map(n => n.chapterName);
+      const newSelecteds = rows.map(n => createId(n));
       setSelected(newSelecteds);
       return;
     }
@@ -299,13 +285,14 @@ export default function ChapterSelector(props) {
               {stableSort(rows, getSorting(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.chapterName);
+                  
+                  const isItemSelected = isSelected(createId(row));
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <TableRow
                       hover
-                      onClick={event => handleClick(event, row.chapterName)}
+                      onClick={event => handleClick(event, createId(row))}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}

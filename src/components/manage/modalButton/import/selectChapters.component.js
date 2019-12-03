@@ -90,6 +90,7 @@ function ListItemLink(props) {
 }
 
 export default function SelectChapterBtn(props) {
+  const { textbooks, selected, setSelected, searchInput, setSearchInput, pacing, setPacing} = props;
     const classes = useStyles();
     // getModalStyle is not a pure function, we roll the style only on the first render
     const [open, setOpen] = React.useState(false);
@@ -98,9 +99,7 @@ export default function SelectChapterBtn(props) {
     const [error, setError] = React.useState("");
     const [textbook, setTextbook] = React.useState("");
     const [chapters, setChapters] = React.useState([]);
-    const [pacing, setPacing] = React.useState("");
     const [chapter, setChapter] = React.useState("");
-    const { textbooks } = props;
     const [currentTextbook, setCurrentTextbook] = React.useState([]);
     const [rows, setRows] = React.useState([]);
     const [rowsPerPage, setRowsPerPage] = React.useState(20);
@@ -108,6 +107,21 @@ export default function SelectChapterBtn(props) {
     const handleOpen = () => {
         setOpen(true);
     };
+
+    const search = event => {
+      let filter = event.target.value;
+      setSearchInput(filter);
+      let rowsNew = createRows(currentTextbook, chapter);
+      let result = [];
+
+      for (let ele of rowsNew) {
+        if (ele.chapterName.indexOf(filter) !== -1) {
+          result.push(ele);
+        }
+      }
+      setRows(result);
+      setRowsPerPage(sendRowNum(result));
+    }
 
     const sendRowNum = arr => {
       if (arr.length >= 20 || arr.length === 0) {
@@ -117,11 +131,17 @@ export default function SelectChapterBtn(props) {
     }
 
     const handleClose = () => {
-        setOpen(false);
+        if(error === "") {
+          setOpen(false);
+        }
     };
 
-    const isFullFilled = () => {
-        return true;
+    const handleSelect = () => {
+      if(selected.length !== 0 && pacing === "") {
+        setError("Choose a pacing");
+      } else {
+        handleClose();
+      }
     }
 
     const handleChange = (e) => {
@@ -146,9 +166,7 @@ export default function SelectChapterBtn(props) {
             let rowsNew = createRows(textbookJson, chapter);
             setRows(rowsNew);
             setRowsPerPage(sendRowNum(rowsNew));
-            if (value === "") {
-              setChapter("");
-            }
+            setChapter("");
             break;
           case "chapter":
             setChapter(value);
@@ -158,6 +176,9 @@ export default function SelectChapterBtn(props) {
             break;
           case "pacing":
             setPacing(value);
+            if(value !== "") {
+              setError("");
+            }
             break;
           default:
             console.log("invalid name");
@@ -173,7 +194,7 @@ export default function SelectChapterBtn(props) {
           color="default"
           startIcon={<PublishIcon />}
         >
-          0 Chapters Selected
+          {selected.length} Chapters Selected
         </Button>
         <Modal
           aria-labelledby="simple-modal-title"
@@ -243,20 +264,21 @@ export default function SelectChapterBtn(props) {
                   <SearchIcon />
                 </Grid>
                 <Grid item>
-                  <TextField id="input-with-icon-grid" label="Search" />
+                  <TextField id="input-with-icon-grid" label="Search" onChange={search} value={searchInput}/>
                 </Grid>
               </Grid>
             </FormControl>
 
             <form className={classes.form}>
               <ChapterSelector rows={rows} chapter={sendChapter(chapter)} rowsPerPage={rowsPerPage} 
-                setRowsPerPage={setRowsPerPage}
+                setRowsPerPage={setRowsPerPage} selected={selected} setSelected={setSelected}
               />
               <Button
                 variant="contained"
                 color="primary"
                 className={classes.modalBtn}
                 startIcon={<PublishIcon />}
+                onClick={handleSelect}
               >
                 Select
               </Button>
