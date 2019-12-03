@@ -201,7 +201,6 @@ export default function EditBtn(props) {
               name="notes"
               onChange={handleChange}
               value={notes}
-              defaultValue={notes}
             />
             <FormControlLabel
               control={

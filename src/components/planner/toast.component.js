@@ -4,6 +4,7 @@ import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
     close: {
@@ -41,9 +42,11 @@ export default function Toast(props) {
                 }}
                 message={<span id="message-id">Updated successfully!!</span>}
                 action={[
+                    <Link key="undoLink" title="Dashboard" to="/planner/dashboard">
                     <Button key="undo" color="secondary" size="small" onClick={handleClose}>
-                        UNDO
-          </Button>,
+                        View
+                    </Button>
+                    </Link>,
                     <IconButton
                         key="close"
                         aria-label="close"

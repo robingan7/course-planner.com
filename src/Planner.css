@@ -641,6 +641,15 @@ label.hamburger {
   right:5px;
   top:5px;
 }
+
+.planListSearch{
+  margin-left:15px!important;
+  width:130px;
+}
+
+.planListPeriod{
+  margin-left:15px!important;
+}
 /*not used
 
 input.hamburger:checked ~ nav.primnav .secnav > li:nth-child(5) {
