@@ -10,10 +10,9 @@ import Notification from "./planner/notification.component";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { BLOCKS, MAX_NUM_OF_CLASSES} from "../data/schedules/smchs";
 import Toast from "./planner/toast.component";
+import { DEFAULT_STARTTIME, DEFAULT_ENDTIME, getCurrentDate, getNextDay, addDefaultTime} from "../data/constants";
 
 const cookies = new Cookies();
-const DEFAULT_STARTTIME = "00:00";
-const DEFAULT_ENDTIME = "00:01";
 
 export default class Planner extends PureComponent {
   constructor(props) {
@@ -26,7 +25,6 @@ export default class Planner extends PureComponent {
     this.onUpdateFromSettings = this.onUpdateFromSettings.bind(
       this
     );
-    this.getCurrentDate = this.getCurrentDate.bind(this);
     this.toggleChecked = this.toggleChecked.bind(this);
     this.unChecked = this.unChecked.bind(this);
     this.doNothing = this.doNothing.bind(this);
@@ -43,7 +41,7 @@ export default class Planner extends PureComponent {
       name: "",
       googleId: "",
       imageUrl: "",
-      currentDate: this.getCurrentDate(new Date()),
+      currentDate: getCurrentDate(new Date()),
       currentViewName: "Month",
       mainResourceName: "period",
       resources: [{ "fieldName": "period", "title": "Period", "instances": [{ "id": "Default Class", "text": "Default Class" }, { "id": "Off", "text": "Off" }]}],
@@ -56,12 +54,7 @@ export default class Planner extends PureComponent {
   }
 
   /* edit appointments methods */
-  getNextDay(d) {
-    let nextDay = new Date(d);
-    nextDay.setDate(d.getDate() + 1);
-
-    return nextDay;
-  }
+  
 
   autoAdjust(editSchedule) {
     let resultList = [];
@@ -80,13 +73,13 @@ export default class Planner extends PureComponent {
             editSchedule, currentPeriod, resultList);
         }
         
-        nextStartDay = this.getCurrentDate(this.getNextDay(validDay)) + "T" + DEFAULT_STARTTIME;
+        nextStartDay = getCurrentDate(getNextDay(validDay)) + "T" + DEFAULT_STARTTIME;
         console.log(validDay, nextStartDay);
         currentAppoint.startDate = validDay;
         currentAppoint.endDate = validDay;
-        resultList.push(Object.assign({}, this.addDefaultTime(currentAppoint)));
+        resultList.push(Object.assign({}, addDefaultTime(currentAppoint)));
       } else {
-        nextStartDay = this.getCurrentDate(this.getNextDay(new Date(currentAppoint.startDate))) + "T" + DEFAULT_STARTTIME;
+        nextStartDay = getCurrentDate(getNextDay(new Date(currentAppoint.startDate))) + "T" + DEFAULT_STARTTIME;
         console.log(nextStartDay);
         resultList.push(Object.assign({}, currentAppoint));
       }
@@ -98,8 +91,8 @@ export default class Planner extends PureComponent {
     if (!this.isONAnOffDay(date, editSchedule, period, resultList)) {
       return new Date(date);
     }
-    let nextDay = this.getNextDay(new Date(date));
-    return this.getValidDay(this.getCurrentDate(nextDay) + "T" + DEFAULT_STARTTIME,
+    let nextDay = getNextDay(new Date(date));
+    return this.getValidDay(getCurrentDate(nextDay) + "T" + DEFAULT_STARTTIME,
       editSchedule, period, resultList);
   }
 
@@ -174,14 +167,6 @@ export default class Planner extends PureComponent {
     return /\d/.test(myString);
   }
 
-  addDefaultTime(appoint){
-    let { startDate, endDate } = appoint;/* date object */
-    appoint.startDate = this.getCurrentDate(startDate) + "T" + DEFAULT_STARTTIME;
-    appoint.endDate = this.getCurrentDate(endDate) + "T" + DEFAULT_ENDTIME;
-
-    return appoint;
-  }
-
   getDuration(appoint) {
     let startDateNum = new Date(appoint.startDate).getDate();
     let endDateNum = new Date(appoint.endDate).getDate();
@@ -198,13 +183,13 @@ export default class Planner extends PureComponent {
 
       appoint.startDate = startDate;
       appoint.endDate = appoint.startDate;
-      let result = [Object.assign({}, this.addDefaultTime(appoint))];
+      let result = [Object.assign({}, addDefaultTime(appoint))];
       for (let i = 0; i < duration; i++) {
-        newDate = this.getNextDay(newDate);
+        newDate = getNextDay(newDate);
         appoint.startDate = newDate;
         appoint.endDate = newDate;
 
-        let clone = Object.assign({}, this.addDefaultTime(appoint));
+        let clone = Object.assign({}, addDefaultTime(appoint));
         result.push(clone);
       }
       return result;
@@ -213,7 +198,7 @@ export default class Planner extends PureComponent {
     appoint.startDate = startDate;
     appoint.endDate = startDate;
 
-    return [this.addDefaultTime(appoint)];
+    return [addDefaultTime(appoint)];
   }
 
   updateAppointmentsToMongo(appoint) {
@@ -296,6 +281,14 @@ export default class Planner extends PureComponent {
 
         finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
       }
+    } else if (type === "import"){
+      const dayList = appoint;
+      const isAutoAjd = dayList[0].isAutoAdjust;
+
+      for (let ele of dayList) {
+        copy.push(ele);
+      }
+      finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
     }
 
     finalArray.sort((a, b) => {
@@ -370,17 +363,6 @@ export default class Planner extends PureComponent {
   }
   toggleChecked() {
     this.setState({ isChecked: !this.state.isChecked });
-  }
-
-  getCurrentDate(d) {
-      let month = "" + (d.getMonth() + 1),
-          day = "" + d.getDate(),
-          year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
   }
 
   currentViewNameChange(changedName) {

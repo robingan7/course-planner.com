@@ -11,6 +11,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
+import { trimLongTitle }  from "../../data/constants"
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -23,6 +24,7 @@ const useStyles = makeStyles(theme => ({
     boxShadow: "0 18px 28px rgba(0,0,0,0.35), 0 10px 20px rgba(0,0,0,0.32)",
     paddingTop: 10,
     paddingBottom: 10,
+    maxHeight:400
   }
 }));
 
@@ -69,6 +71,7 @@ export default function PlansList(props) {
       let id = 0;
       appointments.map(appointment => {
         const labelId = `checkbox-list-label-${appointment.title}`;
+        const titleText = trimLongTitle(appointment.title);
         plansList.push( 
           (<ListItem
             key={id}
@@ -85,7 +88,7 @@ export default function PlansList(props) {
                 onChange={handleCheckBox}
               />
             </ListItemIcon>
-            <ListItemText id={labelId} primary={appointment.title} />
+            <ListItemText id={labelId} primary={titleText} />
             <ListItemSecondaryAction>
               <EditBtn id={id} planName={appointment.title} appointment={appointment} 
                 appointFunc={appointFunc}

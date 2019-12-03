@@ -15,6 +15,7 @@ import "react-day-picker/lib/style.css";
 import ListItem from '@material-ui/core/ListItem';
 import SelectChapterBtn from './import/selectChapters.component';
 import Preview from './import/preview.component';
+import { getCurrentDate, getNextDay, addDefaultTime} from "../../../data/constants";
 
 const useStyles = makeStyles(theme => ({
     modalInput: {
@@ -36,9 +37,7 @@ const useStyles = makeStyles(theme => ({
 export default function ImportBtn(props) {
     const classes = useStyles();
     const { appointFunc, resources, textbooks} = props;
-  // getModalStyle is not a pure function, we roll the style only on the first render
     const [open, setOpen] = React.useState(false);
-    const [openC, setOpenC] = React.useState(false);
     const [isAutoAdjust, setIsAutoAdjust] = React.useState(true);
     const [error, setError] = React.useState("");
     const [startDate, setStartDate] = React.useState("");
@@ -46,7 +45,9 @@ export default function ImportBtn(props) {
     const [selected, setSelected] = React.useState([]);
     const [searchInput, setSearchInput] = React.useState("");
     const [pacing, setPacing] = React.useState("");
-    const [preview, setPreview] = React.useState(true);
+    const [preview, setPreview] = React.useState(false);
+    const [previewList, setPreviewList] = React.useState([]);
+    const [orgPreviewList, setOrgPreviewList] = React.useState([]);
 
     const handleChangeSwitch = name => event => {
         setIsAutoAdjust( event.target.checked );
@@ -76,11 +77,11 @@ export default function ImportBtn(props) {
 
     const handleChange2 = (name, value) => {
         switch (name) {
-        case 'startDate':
-            setStartDate(value);
-            break;
-        default:
-            console.log('invalid name in handleChange2');
+            case 'startDate':
+                setStartDate(value);
+                break;
+            default:
+                console.log('invalid name in handleChange2');
         }
     };
 
@@ -92,25 +93,68 @@ export default function ImportBtn(props) {
         setPreview(false);
     }
 
-    const addAppoint = () => {
+    const openReview = () => {
+        setError("");
         if (!isFullFilled()) {
-            setError( "Please fill in all the fields" );
+            setError("Please fill in all the fields");
         } else {
-            /*
-        appointFunc({
-            note: notes,
-            title: title,
-            endDate: endDate,
-            period: period,
-            startDate: startDate,
-            isAutoAdjust: isAutoAdjust
-        }, "add");*/
+            let pacingIndex = 1;
+            switch(pacing){
+                case 'basic':
+                    pacingIndex = 1;
+                    break;
+                case 'general':
+                    pacingIndex = 2;
+                    break;
+                case 'advanced':
+                    pacingIndex = 3;
+                    break;
+                case 'heavy_lab':
+                    pacingIndex = 4;
+                    break;
+                default:
+                    console.log("error in openReview");
+            }
+
+            let result = [];
+            for(let ele of selected) {
+                let list = ele.split('_');
+                result.push({ name: list[0], days: list[pacingIndex]});
+            }
+            setPreview(true);
+            setPreviewList(result);
+            setOrgPreviewList(result);
         }
     }
 
-    const handleClick = () => {
-        setOpenC(!openC);
-    };
+    const formatFromImports = arr => {
+        let startDateOrg = getCurrentDate(startDate);//y-m-d
+        let result = [];
+
+        for(let ele of arr) {
+            let title = ele.name;
+            let duration = ele.days;
+
+            for(let i = 0; i < duration; i++) {
+                startDateOrg = getNextDay(new Date(startDateOrg));//date obj
+                let appoint = {
+                    title: title,
+                    period: period,
+                    endDate: startDateOrg,
+                    startDate: startDateOrg,
+                    notes: "",
+                    isAutoAdjust: isAutoAdjust
+                }
+                result.push(addDefaultTime(appoint));
+            }
+        }
+        return result;
+    }
+
+    const importToPlanner = () => {
+        let result = formatFromImports(previewList);
+        appointFunc(result, "import");
+    }
 
     let array = [];
     resources.map(resource => {
@@ -158,16 +202,20 @@ export default function ImportBtn(props) {
                 <Select native name="period" onChange={handleChange}>
                     <option value="" />
                     {array.map(instance => {
-                    return <option key={instance.id} value={instance.id}>{instance.text}</option>;
+                        if (instance.id !== "Off"){
+                            return <option key={instance.id} value={instance.id}>{instance.text}</option>;
+                        }
                     })}
                 </Select>
                 </FormControl>
             
                 <SelectChapterBtn textbooks={textbooks} selected={selected} setSelected={setSelected} searchInput={searchInput}
-                            setSearchInput={setSearchInput} pacing={pacing} setPacing={setPacing}
+                    setSearchInput={setSearchInput} pacing={pacing} setPacing={setPacing}
                 />
 
-                <Preview open={preview} handleClose={closePreview}/>
+                <Preview open={preview} handleClose={closePreview} previewList={previewList} 
+                    setPreviewList={setPreviewList} orgPreviewList={orgPreviewList} importToPlanner={importToPlanner}
+                />
                     
                 <FormControlLabel
                 control={
@@ -186,7 +234,7 @@ export default function ImportBtn(props) {
                 color="primary"
                 className={classes.modalBtn}
                 startIcon={<PublishIcon />}
-                onClick={addAppoint}
+                onClick={openReview}
                 >
                 Import
                 </Button>

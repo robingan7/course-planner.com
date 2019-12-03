@@ -611,7 +611,8 @@ label.hamburger {
 
 .preview{
   width:100%;
-  margin:5px 0;
+  margin: 0;
+  margin-bottom: 3px;
 }
 
 .previewDelete{
@@ -627,6 +628,18 @@ label.hamburger {
 .previewDuration{
   margin-right:5px!important;
   width:30px;
+}
+
+.previewList{
+  height:470px;
+  overflow-y:auto;
+  margin-bottom:5px;
+}
+
+.previewRestore{
+  position: absolute!important;
+  right:5px;
+  top:5px;
 }
 /*not used
 
