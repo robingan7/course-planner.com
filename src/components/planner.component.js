@@ -11,7 +11,8 @@ import Notification from "./planner/notification.component";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { BLOCKS, MAX_NUM_OF_CLASSES} from "../data/schedules/smchs";
 import Toast from "./planner/toast.component";
-import { DEFAULT_STARTTIME, getCurrentDate, getNextDay, addDefaultTime, possibleRemoveDate} from "../data/constants";
+import { DEFAULT_STARTTIME, getCurrentDate, getNextDay, addDefaultTime, possibleRemoveDate, convertDateFormat,
+  addId} from "../data/constants";
 
 const cookies = new Cookies();
 
@@ -34,6 +35,10 @@ export default class Planner extends PureComponent {
     this.updateAppointmentsToMongo = this.updateAppointmentsToMongo.bind(this);
     this.updateImports = this.updateImports.bind(this);
     this.controlToast = this.controlToast.bind(this);
+    this.commitChangesFromCalendar = this.commitChangesFromCalendar.bind(this);
+    this.setIsShiftPressed = this.setIsShiftPressed.bind(this);
+    this.setAutoAdjustCalendar = this.setAutoAdjustCalendar.bind(this);
+    this.updateAppointFromCalendar = this.updateAppointFromCalendar.bind(this);
 
     this.state = {
       isChecked: false,
@@ -50,11 +55,68 @@ export default class Planner extends PureComponent {
       blocks:[],
       appointments: [],
       canEditEmail: true,
-      toastOpen: false
+      toastOpen: false,
+      isShiftPressed: false,
+      autoAdjustCalendar:true
     };
   }
 
   /* edit appointments methods */
+  setAutoAdjustCalendar(b){
+    this.setState({ autoAdjustCalendar: b });
+  }
+
+  setIsShiftPressed(b) {
+    this.setState({ isShiftPressed: b });
+  }
+
+  updateAppointFromCalendar(appoint) {
+    let result = this.sortPossibleAdjust(convertDateFormat(appoint), this.state.autoAdjustCalendar);
+
+    result.sort((a, b) => {
+      if (a.startDate > b.startDate) {
+        return 1;
+      } else if (a.startDate < b.startDate) {
+        return -1;
+      }
+      return 0;
+    });
+    this.updateAppointmentsToMongo(result);
+  }
+
+  commitChangesFromCalendar({ added, changed, deleted }) {
+    this.setState((state) => {
+      let { appointments } = state;
+      const { isShiftPressed } = this.state;
+      if (added) {
+        const startingAddedId = appointments.length > 0 ? appointments[appointments.length - 1].id + 1 : 0;
+        appointments = [...appointments, { id: startingAddedId, ...added }];
+        this.updateAppointFromCalendar(appointments);
+      }
+      if (changed) {
+        if (isShiftPressed) {
+          const changedAppointment = appointments.find(appointment => changed[appointment.id]);
+          const startingAddedId = appointments.length > 0 ? appointments[appointments.length - 1].id + 1 : 0;
+          appointments = [
+            ...appointments,
+            { ...changedAppointment, id: startingAddedId, ...changed[changedAppointment.id] },
+          ];
+        } else {
+          appointments = appointments.map(appointment => (
+            changed[appointment.id]
+              ? { ...appointment, ...changed[appointment.id] }
+              : appointment));
+        }
+        this.updateAppointFromCalendar(appointments);
+      }
+      if (deleted !== undefined) {
+        appointments = appointments.filter(appointment => appointment.id !== deleted);
+        this.updateAppointFromCalendar(appointments);
+      }
+      return { appointments };
+    });
+  }
+
   autoAdjust(editSchedule) {
     let resultList = [];
     let nextStartDay = {};
@@ -132,7 +194,6 @@ export default class Planner extends PureComponent {
     if (!this.hasNumber(period)) {
       return  helpReturn || this.isOnOffDayOnSMCHS(date);
     } else {
-      console.log(this.isOnOffDayOnSMCHS(date, Number(period.slice(-1))));
       return helpReturn ||this.isOnOffDayOnSMCHS(date, Number(period.slice(-1)));
     }
   }
@@ -220,7 +281,8 @@ export default class Planner extends PureComponent {
     return [addDefaultTime(appoint)];
   }
 
-  updateAppointmentsToMongo(appoint) {
+  updateAppointmentsToMongo(appointIn) {
+    let appoint = addId(appointIn);
     const user = {
       filter: {
         _id: this.state.id
@@ -253,13 +315,13 @@ export default class Planner extends PureComponent {
 
     if (isAutoAjd) {
       try {
-        this.controlToast(true)
         return this.autoAdjust(arr);
       } catch (err) {
         console.log(err);
       }
+    } else {
+      return arr;
     }
-    
   }
 
   appointFunc(appoint, type, index=-1) {
@@ -319,7 +381,7 @@ export default class Planner extends PureComponent {
       return 0;
     });
     console.log(finalArray);
-    //this.updateAppointmentsToMongo(finalArray);
+    this.updateAppointmentsToMongo(finalArray);
   }
 
   /* ----------------- */
@@ -339,14 +401,13 @@ export default class Planner extends PureComponent {
     axios
       .post(this.props.serverLink + "/signup-login/update", user)
       .then(res => {
+        this.controlToast(true);
         const updated = {
           blocks: JSON.parse(res.data.info.blocks),
           textbooks: JSON.parse(res.data.info.textbooks),
           resources: JSON.parse(res.data.info.resources)
         };
-
         this.setState(updated);
-        this.controlToast(true);
       })
       .catch(err => {
         console.log(err);
@@ -471,8 +532,11 @@ export default class Planner extends PureComponent {
       resources,
       toastOpen,
       blocks,
-      textbooks
+      textbooks,
+      mainResourceName,
+      autoAdjustCalendar
     } = this.state;
+
     return (
       <React.Fragment>
         <img src="/logo192.png" className="logoImg" alt="logoImg" />
@@ -567,6 +631,11 @@ export default class Planner extends PureComponent {
                 currentViewName={currentViewName}
                 resources={resources}
                 viewChange={this.currentViewNameChange}
+                mainResourceName={mainResourceName}
+                setIsShiftPressed={this.setIsShiftPressed}
+                commitChangesFromCalendar={this.commitChangesFromCalendar}
+                autoAdjustCalendar={autoAdjustCalendar}
+                setAutoAdjustCalendar={this.setAutoAdjustCalendar}
               />
             )}
           />

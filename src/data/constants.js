@@ -2,6 +2,7 @@ export const DEFAULT_STARTTIME = "00:00";
 export const DEFAULT_ENDTIME = "00:01";
 
 export const getCurrentDate = d => {
+    d = new Date(d);
     let month = "" + (d.getMonth() + 1),
         day = "" + d.getDate(),
         year = d.getFullYear();
@@ -46,4 +47,26 @@ export const possibleRemoveDate = d => {
     }
 
     return [year, month, day].join("-");
+}
+
+export const SHIFT_KEY = 16;
+
+export const convertDateFormat = appointments => {
+    let arr = appointments.slice();
+    for (let i = 0; i < arr.length; i++) {
+        arr[i].startDate = getCurrentDate(arr[i].startDate) + "T" + DEFAULT_STARTTIME;
+        arr[i].endDate = getCurrentDate(arr[i].endDate) + "T" + DEFAULT_ENDTIME;
+    }
+    return arr;
+};
+
+export const addId = arr => {
+    if(arr.length === 0) {
+        return [];
+    }
+    let copy = arr.slice();
+    for(let i = 0; i < copy.length; i++) {
+        copy[i].id = i;
+    }
+    return copy;
 }

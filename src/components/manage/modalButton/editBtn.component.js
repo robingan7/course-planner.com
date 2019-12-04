@@ -48,7 +48,7 @@ export default function EditBtn(props) {
   const [endDate, setEndDate] = React.useState(appointment.endDate.split("T")[0]);
   const [title, setTitle] = React.useState(appointment.title);
   const [period, setPeriod] = React.useState(appointment.period);
-  const [notes, setNotes] = React.useState(appointment.notes);
+  const [notes, setNotes] = React.useState(appointment.note);
 
   const handleChangeSwitch = name => event => {
     setIsAutoAdjust(event.target.checked);

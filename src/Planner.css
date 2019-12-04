@@ -441,9 +441,9 @@ label.hamburger {
 
 .calendarBody{
     position: absolute;
-    top:70px;
+    top:85px;
     left:10px;
-    height:calc(100% - 90px);
+    height:calc(100% - 95px);
     border:2px solid black;
     margin-right:10px;
 }
@@ -461,7 +461,7 @@ label.hamburger {
 }
 @media (min-width: 650px) {
     .calendarBody{
-        top:85px;
+        top:90px;
         left:80px;
         height:calc(100% - 100px);
     }
@@ -663,6 +663,13 @@ label.hamburger {
 
 .planListPeriod{
   margin-left:15px!important;
+}
+
+.switchCalendar{
+  position: absolute;
+  top:55px;
+  left:80px;
+  z-index: 7;
 }
 /*not used
 

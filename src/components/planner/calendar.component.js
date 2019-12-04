@@ -17,12 +17,11 @@ import {
   ConfirmationDialog
 } from "@devexpress/dx-react-scheduler-material-ui";
 import { Resources } from "@devexpress/dx-react-scheduler-material-ui";
+import { SHIFT_KEY } from "../../data/constants";
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import { withStyles } from '@material-ui/core/styles';
-
-const SHIFT_KEY = 16;
 const styles = theme => ({
   container: {
     display: 'flex',
@@ -38,18 +37,9 @@ const styles = theme => ({
 export default class Calendar extends Component {
   constructor(props) {
     super(props);
-    this.commitChanges = this.commitChanges.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
-    this.changeMainResource = this.changeMainResource.bind(this);
-    this.state = {
-      isShiftPressed: false,
-      mainResourceName: 'period'
-    };
-  }
-
-  changeMainResource(mainResourceName) {
-    this.setState({ mainResourceName });
+    this.handleChange = this.handleChange.bind(this);
   }
 
   componentDidMount() {
@@ -64,44 +54,18 @@ export default class Calendar extends Component {
 
   onKeyDown(event) {
     if (event.keyCode === SHIFT_KEY) {
-      this.setState({ isShiftPressed: true });
+      this.props.setIsShiftPressed(true);
     }
   }
 
   onKeyUp(event) {
     if (event.keyCode === SHIFT_KEY) {
-      this.setState({ isShiftPressed: false, data: this.props.appointments});
+      this.props.setIsShiftPressed(false);
     }
   }
 
-  commitChanges({ added, changed, deleted }) {
-    this.setState((state) => {
-      let { data } = state;
-      const { isShiftPressed } = this.state;
-      if (added) {
-        const startingAddedId = data.length > 0 ? data[data.length - 1].id + 1 : 0;
-        data = [...data, { id: startingAddedId, ...added }];
-      }
-      if (changed) {
-        if (isShiftPressed) {
-          const changedAppointment = data.find(appointment => changed[appointment.id]);
-          const startingAddedId = data.length > 0 ? data[data.length - 1].id + 1 : 0;
-          data = [
-            ...data,
-            { ...changedAppointment, id: startingAddedId, ...changed[changedAppointment.id] },
-          ];
-        } else {
-          data = data.map(appointment => (
-            changed[appointment.id]
-              ? { ...appointment, ...changed[appointment.id] }
-              : appointment));
-        }
-      }
-      if (deleted !== undefined) {
-        data = data.filter(appointment => appointment.id !== deleted);
-      }
-      return { data };
-    });
+  handleChange(event){
+    this.props.setAutoAdjustCalendar(event.target.checked);
   }
 
   render() {
@@ -110,10 +74,21 @@ export default class Calendar extends Component {
       currentDate,
       currentViewName,
       viewChange,
-      resources
+      resources,
+      mainResourceName,
+      autoAdjustCalendar
     } = this.props;
 
     return (
+      <div>
+        <FormControlLabel
+          control={
+            <Switch checked={autoAdjustCalendar} value="checkeda" onChange={this.handleChange}/>
+          }
+          label="Auto Adjust"
+          className="switchCalendar"
+        />
+
       <div className="calendarBody">
         <Paper style={{
           width: "100%",
@@ -126,7 +101,7 @@ export default class Calendar extends Component {
             onCurrentViewNameChange={viewChange}
           />
           <EditingState
-            onCommitChanges={this.commitChanges}
+              onCommitChanges={this.props.commitChangesFromCalendar}
           />
           <IntegratedEditing />
           <WeekView startDayHour={10} endDayHour={19} />
@@ -154,10 +129,11 @@ export default class Calendar extends Component {
           <AppointmentForm />
           <Resources
             data={resources}
-            mainResourceName={this.state.mainResourceName}
+            mainResourceName={mainResourceName}
           />
         </Scheduler>
       </Paper>
+      </div>
       </div>
     );
   };
