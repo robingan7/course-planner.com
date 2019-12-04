@@ -1,6 +1,6 @@
 export const DEFAULT_STARTTIME = "00:00";
 export const DEFAULT_ENDTIME = "00:01";
-export const baseUrl = "http://localhost:5000";
+export const baseUrl = "";
 
 export const getCurrentDate = d => {
     d = new Date(d);
