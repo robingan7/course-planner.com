@@ -1,5 +1,6 @@
-import React, { Component, PureComponent} from "react";
+import React, { PureComponent } from "react";
 import axios from "axios";
+import { Redirect } from "react-router";
 import Cookies from "universal-cookie";
 import "../Planner.css";
 import Calendar from "./planner/calendar.component";
@@ -10,7 +11,7 @@ import Notification from "./planner/notification.component";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { BLOCKS, MAX_NUM_OF_CLASSES} from "../data/schedules/smchs";
 import Toast from "./planner/toast.component";
-import { DEFAULT_STARTTIME, DEFAULT_ENDTIME, getCurrentDate, getNextDay, addDefaultTime, possibleRemoveDate} from "../data/constants";
+import { DEFAULT_STARTTIME, getCurrentDate, getNextDay, addDefaultTime, possibleRemoveDate} from "../data/constants";
 
 const cookies = new Cookies();
 
@@ -138,7 +139,7 @@ export default class Planner extends PureComponent {
 
   isWeekEnd(date){
     let dateObj = new Date(date);
-    return dateObj.getDay() == 0 || dateObj.getDay() == 6;
+    return dateObj.getDay() === 0 || dateObj.getDay() === 6;
   }
 
   isOnOffDayOnSMCHS(date, period=undefined) {
@@ -149,22 +150,22 @@ export default class Planner extends PureComponent {
       return true;
     }
 
-    if (dayBlock == undefined){
+    if (dayBlock === undefined){
       return this.isWeekEnd(date);
     }
     if (dayBlock !== "Off"){
-      if (period != undefined){
+      if (period !== undefined){
         let dayBlockName = dayBlock.substring(0, dayBlock.length - 1);
         let dayBlockNumber = Number(dayBlock.slice(-1));
         let currentBlocks = BLOCKS.sche[dayBlockName];
         let periodList = [];
         let addNum = 0;
-        for (let [key, value] of Object.entries(currentBlocks)) {
+        for (let key in currentBlocks) {
           if (key.includes("Period 8")) {
             periodList.push(8);
             break;
           }
-          if (key.includes("Block") && !key.includes("/") && key.length == 7){
+          if (key.includes("Block") && !key.includes("/") && key.length === 7){
             let currentPeriod = dayBlockNumber + addNum;
             if (currentPeriod > MAX_NUM_OF_CLASSES){
               periodList.push(currentPeriod - MAX_NUM_OF_CLASSES);
@@ -363,7 +364,7 @@ export default class Planner extends PureComponent {
     axios
       .post(this.props.serverLink + "/signup-login/getAppointment", user)
       .then(res => {
-        if (res.data.message == "Got it!") {
+        if (res.data.message === "Got it!") {
           this.setState({
             appointments: res.data.schedule,
             resources: res.data.resources,
@@ -390,8 +391,8 @@ export default class Planner extends PureComponent {
   signout() {
     let promise = new Promise((resolve, reject) => {
       let allCookies = cookies.getAll();
-      for (let [key, value] of Object.entries(allCookies)) {
-        if (key.indexOf("cp_") != -1) {
+      for (let key in allCookies) {
+        if (key.indexOf("cp_") !== -1) {
           cookies.remove(key);
         }
       }
@@ -408,7 +409,7 @@ export default class Planner extends PureComponent {
   UNSAFE_componentWillMount() {
     let cp_id = cookies.get("cp__id");
     let cp_email = cookies.get("cp_email");
-    if (cp_id == undefined || cp_email == undefined) {
+    if (cp_id === undefined || cp_email === undefined) {
       this.signout();
     } else {
       let allCookies = cookies.getAll();
@@ -420,7 +421,7 @@ export default class Planner extends PureComponent {
         imageUrl: "/logo192.png"
       });
 
-      if (allCookies.cp_loginType == "google") {
+      if (allCookies.cp_loginType === "google") {
         this.setState({
           googleId: allCookies.cp_googleId,
           canEditEmail: false,
@@ -520,7 +521,7 @@ export default class Planner extends PureComponent {
 
         <div className="userReplace" id="user">
           <section>
-            <img src={this.state.imageUrl} />
+            <img src={this.state.imageUrl} alt={this.state.imageUrl}/>
             <section>
               <div className="nameReplace">{this.state.name}</div>
               <div className="actionsReplace">
@@ -528,9 +529,9 @@ export default class Planner extends PureComponent {
                   settings
                 </Link>{" "}
                 |{" "}
-                <a className="signout" onClick={this.signout}>
+                <span className="signout" onClick={this.signout}>
                   logout
-                </a>
+                </span>
               </div>
             </section>
           </section>
@@ -542,19 +543,7 @@ export default class Planner extends PureComponent {
         />
 
         <Switch>
-          <Route
-            path="/planner"
-            exact
-            component={() => (
-              <Calendar
-                appointments={appointments}
-                defaultCurrentDate={currentDate}
-                currentViewName={currentViewName}
-                viewChange={this.currentViewNameChange}
-                resources={resources}
-              />
-            )}
-          />
+          <Redirect exact from="/planner" to="/planner/dashboard" />
           <Route
             path="/planner/settings"
             component={() => (

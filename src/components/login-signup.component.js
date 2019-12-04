@@ -121,7 +121,7 @@ export default class LoginSignup extends Component {
         });
     }
 
-    componentWillMount(){
+    UNSAFE_componentWillMount(){
       if(cookies.get("cp__id") != undefined && cookies.get("cp_email") != undefined){
         window.location = "/planner";
       }

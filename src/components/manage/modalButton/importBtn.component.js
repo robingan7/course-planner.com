@@ -12,7 +12,6 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import "react-day-picker/lib/style.css";
-import ListItem from '@material-ui/core/ListItem';
 import SelectChapterBtn from './import/selectChapters.component';
 import Preview from './import/preview.component';
 import { getCurrentDate, getNextDay, addDefaultTime} from "../../../data/constants";
@@ -157,11 +156,11 @@ export default function ImportBtn(props) {
     }
 
     let array = [];
-    resources.map(resource => {
-        if (resource.fieldName == "period") {
+    for (let resource of resources) {
+        if (resource.fieldName === "period") {
             array = resource.instances;
         }
-    });
+    };
 
     return (
         <div>

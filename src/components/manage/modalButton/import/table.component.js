@@ -13,10 +13,6 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import Checkbox from "@material-ui/core/Checkbox";
-import IconButton from "@material-ui/core/IconButton";
-import Tooltip from "@material-ui/core/Tooltip";
-import FilterListIcon from "@material-ui/icons/FilterList";
-import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -210,7 +206,6 @@ export default function ChapterSelector(props) {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("chapterName");
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(true);
   const handleRequestSort = (event, property) => {
     const isDesc = orderBy === property && order === "desc";
     setOrder(isDesc ? "asc" : "desc");
@@ -268,7 +263,7 @@ export default function ChapterSelector(props) {
             <Table
                 className={classes.table}
                 aria-labelledby="tableTitle"
-                size={dense ? "small" : "medium"}
+                size="small"
                 aria-label="enhanced table"
                 stickyHeader
             >

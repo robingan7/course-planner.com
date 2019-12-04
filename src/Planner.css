@@ -264,6 +264,20 @@ ul {
   padding-right: 0;
 }
 
+.userReplace .actionsReplace span {
+  padding: 0 0.5em;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.userReplace .actionsReplace span:hover{
+    text-decoration: underline;
+}
+.userReplace .actionsReplace span:last-child {
+  padding-right: 0;
+}
+
 content {
   color: rgba(255, 255, 255, 0.9);
   font-size: 8vw;
@@ -545,7 +559,7 @@ label.hamburger {
 
 .modalBody{
   position: absolute;
-  top:99px;
+  top:90px;
   left:calc(50% - 210px);
   width:400px;
   height:auto;

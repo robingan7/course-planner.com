@@ -35,28 +35,6 @@ const styles = theme => ({
   },
 });
 
-const ResourceSwitcher = withStyles(styles, { name: 'ResourceSwitcher' })(
-  ({
-    mainResourceName, onChange, classes, resources,
-  }) => (
-      <div className={classes.container}>
-        <div className={classes.text}>
-          Main resource name:
-      </div>
-        <Select
-          value={mainResourceName}
-          onChange={e => onChange(e.target.value)}
-        >
-          {resources.map(resource => (
-            <MenuItem key={resource.fieldName} value={resource.fieldName}>
-              {resource.title}
-            </MenuItem>
-          ))}
-        </Select>
-      </div>
-    ),
-);
-
 export default class Calendar extends Component {
   constructor(props) {
     super(props);
