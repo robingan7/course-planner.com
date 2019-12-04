@@ -155,6 +155,8 @@ export default class LoginSignup extends Component {
     }
 
     responseGoogleLogin(res) {
+      console.log(res);
+
       const user = {
         email: res.profileObj.email
       };
