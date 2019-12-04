@@ -26,6 +26,10 @@ export default class LoginSignup extends Component {
         signInBtnText: "sign in",
         signUpBtnText: "sign up"
       };
+
+      if (this.props.currentLogin.id !== undefined) {
+        window.location = "/planner";
+      }
     }
 
     onChangeForm(e) {
@@ -121,12 +125,6 @@ export default class LoginSignup extends Component {
         });
     }
 
-    UNSAFE_componentWillMount(){
-      if(cookies.get("cp__id") != undefined && cookies.get("cp_email") != undefined){
-        window.location = "/planner";
-      }
-    }
-
     onSignup(e) {
       e.preventDefault();
 
@@ -155,7 +153,7 @@ export default class LoginSignup extends Component {
       //this.signup(response, 'google');
     }
 
-    responseGoogleLogin(res){
+    responseGoogleLogin(res) {
       const user = {
         email: res.profileObj.email
       };
@@ -163,7 +161,8 @@ export default class LoginSignup extends Component {
       this.onLoginHelper(user, true);
     }
 
-    redirectToPlanner(input_user){
+    redirectToPlanner(input_user) {
+      this.props.setCurrentLogin(input_user);
       for (let [key, value] of Object.entries(input_user)) {
           cookies.set("cp_" + key, value);
       }
