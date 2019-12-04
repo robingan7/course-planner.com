@@ -14,7 +14,7 @@ app.use(express.json());
 const LOCAL = "mongodb://localhost:27017/Courseplanner";
 const CLUSTER = "mongodb+srv://robingan7:gzt11111@cluster0-t6fgx.mongodb.net/test?retryWrites=true&w=majority";
 
-mongoose.connect(LOCAL || CLUSTER, {
+mongoose.connect( CLUSTER,  {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true

@@ -41,7 +41,8 @@ router.route("/update").post(async (req, res) => {
 
     let user = await Signup.findOneAndUpdate(filter, update, {
       new: true,
-      upsert: false
+      upsert: false,
+      useFindAndModify: false
     }).exec();
 
     if (!user) {

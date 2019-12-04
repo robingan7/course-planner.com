@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import axios from "axios";
 import { Redirect } from "react-router";
 import Cookies from "universal-cookie";
@@ -13,10 +13,11 @@ import { BLOCKS, MAX_NUM_OF_CLASSES} from "../data/schedules/smchs";
 import Toast from "./planner/toast.component";
 import { DEFAULT_STARTTIME, getCurrentDate, getNextDay, addDefaultTime, possibleRemoveDate, convertDateFormat,
   addId} from "../data/constants";
+import withUnmounted from "@ishawnwang/withunmounted";
 
 const cookies = new Cookies();
 
-export default class Planner extends PureComponent {
+export default class Planner extends Component {
   constructor(props) {
     super(props);
     this.signout = this.signout.bind(this);
@@ -31,6 +32,7 @@ export default class Planner extends PureComponent {
     this.unChecked = this.unChecked.bind(this);
     this.doNothing = this.doNothing.bind(this);
     this.getAppointment = this.getAppointment.bind(this);
+    this.getInfo = this.getInfo.bind(this);
     this.appointFunc = this.appointFunc.bind(this);
     this.updateAppointmentsToMongo = this.updateAppointmentsToMongo.bind(this);
     this.updateImports = this.updateImports.bind(this);
@@ -420,6 +422,10 @@ export default class Planner extends PureComponent {
     this.setState({toastOpen: b});
   }
   
+  getInfo(idInput) {
+
+  }
+
   getAppointment(idInput){
    const user = {
      id: idInput
@@ -476,7 +482,6 @@ export default class Planner extends PureComponent {
 
     if (this._isMounted){
       const { currentLogin, setCurrentLogin} = this.props;
-      console.log(currentLogin);
       if (currentLogin.id === undefined) {
         let cp_id = cookies.get("cp__id");
         let cp_email = cookies.get("cp_email");
@@ -517,7 +522,7 @@ export default class Planner extends PureComponent {
             currentUser.googleId = "";
           }
           this.getAppointment(currentUser.id);
-          setCurrentLogin(currentUser);
+          //setCurrentLogin(currentUser);
         }
       } else {
         this.setState({
