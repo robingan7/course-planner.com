@@ -17,19 +17,19 @@
     <meta name="theme-color" content="#000000" />
     <meta name="keywords" content="courseplanner, JS, reactjs, mongodb, express, nodejs" />
     <meta name="author" content="Xiangyu(Robin) Gan, Yuhan" />
-    <meta name="description" 
-      content="A course planner for every teacher :)"
-    />
+    <meta name="description" content="A course planner for every teacher :)"/>
 
     <link rel="apple-touch-icon" href="logo192.png" /><!--change this-->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://courseplanner-com.herokuapp.com">
     <title>Home|Course Planner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/logo16x16.png" />
     <meta property="og:type" content="article" />
     <meta property="og:image" content="/assets/logo512x512.png" />
-    <meta property="og:image:secure_url" content="/assets/logo512x512.png">
+    <meta property="og:image:secure_url" content="/assets/logo512x512.png"/>
     <meta property="article:author" content="https://seeyourschedule.com" />
     <link rel="payment" href="https://patreon.com/robingan7" title="Support my Patreon (robingan)" />
     <link rel="canonical" href="https://seeyourschedule.com/" />
@@ -44,42 +44,3 @@
     <div id="root"></div>
   </body>
 </html>
-
-<!--not used
-<script src="https://apis.google.com/js/api:client.js"></script>
-    <script>
-      function attachSignin(element) {
-          console.log(element.id);
-          auth2.attachClickHandler(element, {},
-            function (googleUser) {
-              document.getElementById('login-google').innerText = "Signed in: " +
-                googleUser.getBasicProfile().getName();
-            }, function (error) {
-              alert(JSON.stringify(error, undefined, 2));
-            });
-        }
-
-      var gapiPromise = (function () {
-        return new Promise(function (resolve, reject) {
-          window.onLoadCallback = function () {
-            resolve();
-          };
-        });
-      }());
-      window.app = window.app || {};
-      window.app.gapiPromise = gapiPromise;
-
-      gapiPromise.then(() => {
-        gapi.load("auth2", () => {
-            // Retrieve the singleton for the GoogleAuth library and set up the client.
-            this.auth2 = gapi.auth2.init({
-              client_id: "xxxxxxxxxx.apps.googleusercontent.com",
-              cookiepolicy: "single_host_origin"
-            });
-            this.attachSignin(document.getElementById("login-google"));
-          });
-      });
-
-      console.log(document.getElementById("login-google"));
-    </script>
--->
