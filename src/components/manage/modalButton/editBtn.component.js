@@ -194,7 +194,6 @@ export default function EditBtn(props) {
               label="Notes"
               multiline
               rows="4"
-              defaultValue=""
               className={classes.modalInput}
               margin="normal"
               variant="outlined"

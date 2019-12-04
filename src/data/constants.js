@@ -33,3 +33,17 @@ export const trimLongTitle = text => {
     }
     return text;
 }
+
+export const possibleRemoveDate = d => {
+    let [year, month, day]= d.split("-");
+
+    if (month.substring(0, 1) === "0") {
+        month = month.substring(1);
+    }
+
+    if (day.substring(0, 1) === "0") {
+        day = day.substring(1);
+    }
+
+    return [year, month, day].join("-");
+}

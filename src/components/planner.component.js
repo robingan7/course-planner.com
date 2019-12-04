@@ -10,7 +10,7 @@ import Notification from "./planner/notification.component";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { BLOCKS, MAX_NUM_OF_CLASSES} from "../data/schedules/smchs";
 import Toast from "./planner/toast.component";
-import { DEFAULT_STARTTIME, DEFAULT_ENDTIME, getCurrentDate, getNextDay, addDefaultTime} from "../data/constants";
+import { DEFAULT_STARTTIME, DEFAULT_ENDTIME, getCurrentDate, getNextDay, addDefaultTime, possibleRemoveDate} from "../data/constants";
 
 const cookies = new Cookies();
 
@@ -54,33 +54,44 @@ export default class Planner extends PureComponent {
   }
 
   /* edit appointments methods */
-  
-
   autoAdjust(editSchedule) {
     let resultList = [];
-    let nextStartDay;
-
+    let nextStartDay = {};
+    let formerPeriod;
+    let startDateIfOffFirst;
     for (let i = 0; i < editSchedule.length; i++) {
       let currentAppoint = editSchedule[i]
       let currentPeriod = currentAppoint.period;
-      if (currentPeriod !== "Off"){
+      if (currentPeriod !== "Off") {
         let validDay;
-        if(i === 0){
-          validDay = this.getValidDay(currentAppoint.startDate,
-            editSchedule, currentPeriod, resultList);
+        if (i === 0 || nextStartDay[currentPeriod] === undefined) {
+          if (startDateIfOffFirst === undefined) {
+            validDay = this.getValidDay(currentAppoint.startDate,
+              editSchedule, currentPeriod, resultList);
+          } else {
+            validDay = this.getValidDay(startDateIfOffFirst,
+              editSchedule, currentPeriod, resultList);
+          }
         } else {
-          validDay = this.getValidDay(nextStartDay,
+          validDay = this.getValidDay(nextStartDay[currentPeriod],
             editSchedule, currentPeriod, resultList);
         }
         
-        nextStartDay = getCurrentDate(getNextDay(validDay)) + "T" + DEFAULT_STARTTIME;
-        console.log(validDay, nextStartDay);
+        nextStartDay[currentPeriod] = getCurrentDate(getNextDay(validDay)) + "T" + DEFAULT_STARTTIME;
+        //console.log(validDay, nextStartDay);
         currentAppoint.startDate = validDay;
         currentAppoint.endDate = validDay;
         resultList.push(Object.assign({}, addDefaultTime(currentAppoint)));
+        formerPeriod = currentPeriod;
       } else {
-        nextStartDay = getCurrentDate(getNextDay(new Date(currentAppoint.startDate))) + "T" + DEFAULT_STARTTIME;
-        console.log(nextStartDay);
+
+        if(i === 0 ) {
+          startDateIfOffFirst = getCurrentDate(getNextDay(new Date(currentAppoint.startDate))) + "T" + DEFAULT_STARTTIME;
+        } else {
+          nextStartDay[formerPeriod] = getCurrentDate(getNextDay(new Date(currentAppoint.startDate))) + "T" + DEFAULT_STARTTIME;
+        }
+        //y-m-d
+        //console.log(nextStartDay);
         resultList.push(Object.assign({}, currentAppoint));
       }
     }
@@ -120,6 +131,7 @@ export default class Planner extends PureComponent {
     if (!this.hasNumber(period)) {
       return  helpReturn || this.isOnOffDayOnSMCHS(date);
     } else {
+      console.log(this.isOnOffDayOnSMCHS(date, Number(period.slice(-1))));
       return helpReturn ||this.isOnOffDayOnSMCHS(date, Number(period.slice(-1)));
     }
   }
@@ -129,8 +141,14 @@ export default class Planner extends PureComponent {
     return dateObj.getDay() == 0 || dateObj.getDay() == 6;
   }
 
-  isOnOffDayOnSMCHS(date, period=undefined){
+  isOnOffDayOnSMCHS(date, period=undefined) {
+    date = possibleRemoveDate(date);//y-m-dT00:00
     let dayBlock = BLOCKS.block[date.split("T")[0]];
+
+    if(dayBlock.substring(0,2) === "Ex") {
+      return true;
+    }
+
     if (dayBlock == undefined){
       return this.isWeekEnd(date);
     }
@@ -142,18 +160,18 @@ export default class Planner extends PureComponent {
         let periodList = [];
         let addNum = 0;
         for (let [key, value] of Object.entries(currentBlocks)) {
-          if (key.includes("Block") && !key.includes("/")){
-            if (key.includes("8")){
-              periodList.push(8);
+          if (key.includes("Period 8")) {
+            periodList.push(8);
+            break;
+          }
+          if (key.includes("Block") && !key.includes("/") && key.length == 7){
+            let currentPeriod = dayBlockNumber + addNum;
+            if (currentPeriod > MAX_NUM_OF_CLASSES){
+              periodList.push(currentPeriod - MAX_NUM_OF_CLASSES);
             } else {
-              let currentPeriod = dayBlockNumber + addNum;
-              if (currentPeriod > MAX_NUM_OF_CLASSES){
-                periodList.push(currentPeriod - MAX_NUM_OF_CLASSES);
-              } else {
-                periodList.push(currentPeriod);
-              }
-              addNum++;
+              periodList.push(currentPeriod);
             }
+            addNum++;
           }
         }
         return !periodList.includes((Number(period)));
@@ -281,7 +299,7 @@ export default class Planner extends PureComponent {
 
         finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
       }
-    } else if (type === "import"){
+    } else if (type === "import") {
       const dayList = appoint;
       const isAutoAjd = dayList[0].isAutoAdjust;
 
