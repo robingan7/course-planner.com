@@ -1,47 +1,25 @@
 {
-  "name": "courseplanner",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@devexpress/dx-react-core": "^2.3.0",
-    "@devexpress/dx-react-scheduler": "^2.3.0",
-    "@devexpress/dx-react-scheduler-material-ui": "^2.3.0",
-    "@ishawnwang/withunmounted": "^1.0.1",
-    "@material-ui/core": "^4.6.1",
-    "@material-ui/icons": "^4.5.1",
-    "axios": "^0.19.0",
-    "bcryptjs": "^2.4.3",
-    "material-table": "^1.54.1",
-    "react": "^16.12.0",
-    "react-day-picker": "^7.4.0",
-    "react-dom": "^16.12.0",
-    "react-facebook-login": "^4.1.1",
-    "react-google-login": "^5.0.7",
-    "react-media-hook": "^0.4.4",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.2.0",
-    "react-window": "^1.8.5",
-    "universal-cookie": "^4.0.2"
-  },
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "server": "node server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "keroku-postbuild": "npm install --prefix client && npm run build --prefix client"
   },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "author": "Robin Gan, Yuhan Chen",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "concurrently": "^5.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.7.12"
   }
 }
