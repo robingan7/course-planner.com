@@ -139,27 +139,32 @@ export default class LoginSignup extends Component {
     }
 
     responseGoogleSignup(res) {
-      const user = {
-        username: res.profileObj.name,
-        email: res.profileObj.email,
-        googleId: res.profileObj.googleId,
-        imageUrl: res.profileObj.imageUrl,
-        loginType: "google",
-        date: new Date()
-      };
+      try {
+         const user = {
+           username: res.profileObj.name,
+           email: res.profileObj.email,
+           googleId: res.profileObj.googleId,
+           imageUrl: res.profileObj.imageUrl,
+           loginType: "google",
+           date: new Date()
+         };
 
-      this.onSignupHelper(user, true);
-      //this.signup(response, 'google');
+         this.onSignupHelper(user, true);
+      }catch {
+
+      }
     }
 
     responseGoogleLogin(res) {
-      console.log(res);
+      try {
+        const user = {
+          email: res.profileObj.email
+        };
 
-      const user = {
-        email: res.profileObj.email
-      };
+        this.onLoginHelper(user, true);
+      }catch {
 
-      this.onLoginHelper(user, true);
+      }
     }
 
     redirectToPlanner(input_user) {
