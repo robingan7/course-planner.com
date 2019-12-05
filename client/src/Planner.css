@@ -658,11 +658,13 @@ label.hamburger {
 
 .planListSearch{
   margin-left:15px!important;
+  margin-bottom:5px!important;
   width:130px;
 }
 
 .planListPeriod{
   margin-left:15px!important;
+  margin-bottom:5px!important;
 }
 
 .switchCalendar{
