@@ -11,6 +11,8 @@ import Notification from "./planner/notification.component";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { BLOCKS, MAX_NUM_OF_CLASSES} from "../data/schedules/smchs";
 import Toast from "./planner/toast.component";
+import SwitchMaterial from "@material-ui/core/Switch";
+
 import {
   DEFAULT_STARTTIME,
   getCurrentDate,
@@ -21,8 +23,32 @@ import {
   addId,
   hasNumber,
   getAddDayList,
-  commitChangedFromCalendar
+  commitChangedFromCalendar,
+  SHIFT_KEY
 } from "../data/constants";
+import Paper from "@material-ui/core/Paper";
+import {
+  ViewState,
+  EditingState,
+  IntegratedEditing
+} from "@devexpress/dx-react-scheduler";
+import {
+  Scheduler,
+  WeekView,
+  Appointments,
+  Toolbar,
+  ViewSwitcher,
+  MonthView,
+  DayView,
+  DateNavigator,
+  TodayButton,
+  AppointmentTooltip,
+  DragDropProvider,
+  AppointmentForm,
+  ConfirmationDialog
+} from "@devexpress/dx-react-scheduler-material-ui";
+import { Resources } from "@devexpress/dx-react-scheduler-material-ui";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 const cookies = new Cookies();
 
@@ -50,7 +76,10 @@ export default class Planner extends Component {
     this.setIsShiftPressed = this.setIsShiftPressed.bind(this);
     this.setAutoAdjustCalendar = this.setAutoAdjustCalendar.bind(this);
     this.updateAppointFromCalendar = this.updateAppointFromCalendar.bind(this);
-
+    this.handleChange = this.handleChange.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
+    this.setCalStyle = this.setCalStyle.bind(this);
     this._isMounted = false;
     this.state = {
       isChecked: false,
@@ -62,18 +91,30 @@ export default class Planner extends Component {
       currentDate: getCurrentDate(new Date()),
       currentViewName: "Month",
       mainResourceName: "period",
-      resources: [{ "fieldName": "period", "title": "Period", "instances": [{ "id": "Default Class", "text": "Default Class" }, { "id": "Off", "text": "Off" }]}],
-      textbooks:[],
-      blocks:[],
+      resources: [
+        {
+          fieldName: "period",
+          title: "Period",
+          instances: [
+            { id: "Default Class", text: "Default Class" },
+            { id: "Off", text: "Off" }
+          ]
+        }
+      ],
+      textbooks: [],
+      blocks: [],
       appointments: [],
       canEditEmail: true,
       toastOpen: false,
       isShiftPressed: false,
-      autoAdjustCalendar:true
+      autoAdjustCalendar: true,
+      calStyle:{display: 'display'}
     };
-
   }
 
+  setCalStyle(inStyle) {
+    this.setState({ calStyle: inStyle });
+  }
   /* edit appointments methods */
   setAutoAdjustCalendar(b){
     this.setState({ autoAdjustCalendar: b });
@@ -457,7 +498,8 @@ export default class Planner extends Component {
 
   componentDidMount() {
     this._isMounted = true;
-
+    window.addEventListener("keydown", this.onKeyDown);
+    window.addEventListener("keyup", this.onKeyUp);
     if (this._isMounted){
       const { currentLogin, setCurrentLogin} = this.props;
       if (currentLogin.id === undefined) {
@@ -530,6 +572,8 @@ export default class Planner extends Component {
 
   componentWillUnmount() {
     this._isMounted = false;
+    window.removeEventListener("keydown", this.onKeyDown);
+    window.removeEventListener("keyup", this.onKeyUp);
   }
 
   onChangeUpdate(e) {
@@ -550,6 +594,22 @@ export default class Planner extends Component {
     });
   }
 
+  handleChange(event){
+    this.setAutoAdjustCalendar(event.target.checked);
+  }
+
+  onKeyDown(event) {
+    if (event.keyCode === SHIFT_KEY) {
+      this.setIsShiftPressed(true);
+    }
+  }
+
+  onKeyUp(event) {
+    if (event.keyCode === SHIFT_KEY) {
+      this.setIsShiftPressed(false);
+    }
+  }
+
   doNothing(){}
 
   render() {
@@ -568,7 +628,8 @@ export default class Planner extends Component {
       blocks,
       textbooks,
       mainResourceName,
-      autoAdjustCalendar
+      autoAdjustCalendar,
+      calStyle
     } = this.state;
 
     return (
@@ -619,7 +680,7 @@ export default class Planner extends Component {
 
         <div className="userReplace" id="user">
           <section>
-            <img src={this.state.imageUrl} alt={this.state.imageUrl}/>
+            <img src={this.state.imageUrl} alt={this.state.imageUrl} />
             <section>
               <div className="nameReplace">{this.state.name}</div>
               <div className="actionsReplace">
@@ -635,10 +696,66 @@ export default class Planner extends Component {
           </section>
         </div>
 
-        <Toast 
-          isOpen={toastOpen}
-          controlToast={this.controlToast}
-        />
+        <div style={calStyle}>
+          <FormControlLabel
+            control={
+              <SwitchMaterial
+                checked={autoAdjustCalendar}
+                value="checkeda"
+                onChange={this.handleChange}
+              />
+            }
+            label="Auto Adjust"
+            className="switchCalendar"
+          />
+
+          <div className="calendarBody">
+            <Paper
+              style={{
+                width: "100%",
+                height: "100%"
+              }}
+            >
+              <Scheduler data={appointments}>
+                <ViewState
+                  defaultCurrentDate={currentDate}
+                  currentViewName={currentViewName}
+                  onCurrentViewNameChange={this.currentViewNameChange}
+                />
+                <EditingState
+                  onCommitChanges={this.commitChangesFromCalendar}
+                />
+                <IntegratedEditing />
+                <WeekView startDayHour={10} endDayHour={19} />
+                <WeekView
+                  name="work-week"
+                  displayName="Work Week"
+                  excludedDays={[0, 6]}
+                  startDayHour={9}
+                  endDayHour={19}
+                />
+                <MonthView />
+                <DayView />
+
+                <Toolbar />
+                <DateNavigator />
+                <TodayButton />
+                <ViewSwitcher />
+                <Appointments />
+                <ConfirmationDialog />
+                <AppointmentTooltip showOpenButton showDeleteButton />
+                <DragDropProvider />
+                <AppointmentForm />
+                <Resources
+                  data={resources}
+                  mainResourceName={mainResourceName}
+                />
+              </Scheduler>
+            </Paper>
+          </div>
+        </div>
+
+        <Toast isOpen={toastOpen} controlToast={this.controlToast} />
 
         <Switch>
           <Redirect exact from="/planner" to="/planner/dashboard" />
@@ -656,23 +773,8 @@ export default class Planner extends Component {
               />
             )}
           />
-          <Route
-            path="/planner/dashboard"
-            component={() => (
-              <Calendar
-                appointments={appointments}
-                defaultCurrentDate={currentDate}
-                currentViewName={currentViewName}
-                resources={resources}
-                viewChange={this.currentViewNameChange}
-                mainResourceName={mainResourceName}
-                setIsShiftPressed={this.setIsShiftPressed}
-                commitChangesFromCalendar={this.commitChangesFromCalendar}
-                autoAdjustCalendar={autoAdjustCalendar}
-                setAutoAdjustCalendar={this.setAutoAdjustCalendar}
-              />
-            )}
-          />
+
+          <Route path="/planner/dashboard" />
 
           <Route
             path="/planner/manage"
@@ -684,6 +786,7 @@ export default class Planner extends Component {
                 blocks={blocks}
                 textbooks={textbooks}
                 updateImports={this.updateImports}
+                setCalStyle={this.setCalStyle}
               />
             )}
           />
@@ -699,3 +802,18 @@ export default class Planner extends Component {
     );
   }
 }
+
+/*
+<Calendar
+  appointments={appointments}
+  defaultCurrentDate={currentDate}
+  currentViewName={currentViewName}
+  resources={resources}
+  viewChange={this.currentViewNameChange}
+  mainResourceName={mainResourceName}
+  setIsShiftPressed={this.setIsShiftPressed}
+  commitChangesFromCalendar={this.commitChangesFromCalendar}
+  autoAdjustCalendar={autoAdjustCalendar}
+  setAutoAdjustCalendar={this.setAutoAdjustCalendar}
+/>
+ */

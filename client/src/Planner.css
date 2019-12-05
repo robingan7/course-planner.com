@@ -450,11 +450,15 @@ label.hamburger {
 
 .regular-container{
   position: absolute;
-  top:70px;
+  top:60px;
   left:10px;
-  height:calc(100% - 90px);
+  height:auto;
   margin-right:10px;
-  width:calc(100% - 25px);
+  width:calc(100% - 15px);
+  background-color: #fff;
+  z-index: 7;
+  padding-top:10px;
+  min-height: calc(100% - 70px);
 }
 .regular-container form{
   justify-content: normal;
@@ -467,10 +471,11 @@ label.hamburger {
     }
 
     .regular-container{
-      top:85px;
+      top:60px;
       left:80px;
-      width:calc(100% - 100px);
-      height:calc(100% - 100px);
+      width:calc(100% - 90px);
+      min-height: calc(100% - 80px);
+      padding-top:20px;
     }
 
     .regular-container form input{

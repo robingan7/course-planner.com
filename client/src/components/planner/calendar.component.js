@@ -89,52 +89,55 @@ export default class Calendar extends Component {
           className="switchCalendar"
         />
 
-      <div className="calendarBody">
-        <Paper style={{
-          width: "100%",
-          height: "100%"
-        }}>
-        <Scheduler data={appointments}>
-          <ViewState
-            defaultCurrentDate={currentDate}
-            currentViewName={currentViewName}
-            onCurrentViewNameChange={viewChange}
-          />
-          <EditingState
-              onCommitChanges={this.props.commitChangesFromCalendar}
-          />
-          <IntegratedEditing />
-          <WeekView startDayHour={10} endDayHour={19} />
-          <WeekView
-            name="work-week"
-            displayName="Work Week"
-            excludedDays={[0, 6]}
-            startDayHour={9}
-            endDayHour={19}
-          />
-          <MonthView />
-          <DayView />
-
-          <Toolbar />
-          <DateNavigator />
-          <TodayButton />
-          <ViewSwitcher />
-          <Appointments />
-          <ConfirmationDialog />
-          <AppointmentTooltip
-            showOpenButton
-            showDeleteButton
-          />
-          <DragDropProvider />
-          <AppointmentForm />
-          <Resources
-            data={resources}
-            mainResourceName={mainResourceName}
-          />
-        </Scheduler>
-      </Paper>
-      </div>
+        
       </div>
     );
   };
 }
+
+/*
+<div className="calendarBody">
+  <Paper style={{
+    width: "100%",
+    height: "100%"
+  }}>
+  <Scheduler data={appointments}>
+    <ViewState
+      defaultCurrentDate={currentDate}
+      currentViewName={currentViewName}
+      onCurrentViewNameChange={viewChange}
+    />
+    <EditingState
+        onCommitChanges={this.props.commitChangesFromCalendar}
+    />
+    <IntegratedEditing />
+    <WeekView startDayHour={10} endDayHour={19} />
+    <WeekView
+      name="work-week"
+      displayName="Work Week"
+      excludedDays={[0, 6]}
+      startDayHour={9}
+      endDayHour={19}
+    />
+    <MonthView />
+    <DayView />
+
+    <Toolbar />
+    <DateNavigator />
+    <TodayButton />
+    <ViewSwitcher />
+    <Appointments />
+    <ConfirmationDialog />
+    <AppointmentTooltip
+      showOpenButton
+      showDeleteButton
+    />
+    <DragDropProvider />
+    <AppointmentForm />
+    <Resources
+      data={resources}
+      mainResourceName={mainResourceName}
+    />
+  </Scheduler>
+</Paper>
+</div> */
