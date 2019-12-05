@@ -98,7 +98,6 @@ export default class LoginSignup extends Component {
       axios
         .post(this.props.serverLink + "/signup-login/signup" + googlePostfix, user)
         .then(res => {
-          console.log(res.data.info);
           let message = res.data.message;
           if (message != "Sign up successfully!!") {
             this.setState({ signupError: message });
@@ -140,7 +139,6 @@ export default class LoginSignup extends Component {
     }
 
     responseGoogleSignup(res) {
-      console.log(res);
       const user = {
         username: res.profileObj.name,
         email: res.profileObj.email,

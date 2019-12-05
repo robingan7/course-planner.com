@@ -13,7 +13,6 @@ import { BLOCKS, MAX_NUM_OF_CLASSES} from "../data/schedules/smchs";
 import Toast from "./planner/toast.component";
 import { DEFAULT_STARTTIME, getCurrentDate, getNextDay, addDefaultTime, possibleRemoveDate, convertDateFormat,
   addId} from "../data/constants";
-import withUnmounted from "@ishawnwang/withunmounted";
 
 const cookies = new Cookies();
 
