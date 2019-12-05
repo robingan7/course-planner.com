@@ -11,8 +11,18 @@ import Notification from "./planner/notification.component";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { BLOCKS, MAX_NUM_OF_CLASSES} from "../data/schedules/smchs";
 import Toast from "./planner/toast.component";
-import { DEFAULT_STARTTIME, getCurrentDate, getNextDay, addDefaultTime, possibleRemoveDate, convertDateFormat,
-  addId} from "../data/constants";
+import {
+  DEFAULT_STARTTIME,
+  getCurrentDate,
+  getNextDay,
+  addDefaultTime,
+  possibleRemoveDate,
+  convertDateFormat,
+  addId,
+  hasNumber,
+  getAddDayList,
+  commitChangedFromCalendar
+} from "../data/constants";
 
 const cookies = new Cookies();
 
@@ -105,10 +115,11 @@ export default class Planner extends Component {
             { ...changedAppointment, id: startingAddedId, ...changed[changedAppointment.id] },
           ];
         } else {
-          appointments = appointments.map(appointment => (
-            changed[appointment.id]
-              ? { ...appointment, ...changed[appointment.id] }
-              : appointment));
+          try{
+            appointments = commitChangedFromCalendar(changed, appointments);
+          }catch(err) {
+            console.log(err);
+          }
         }
         this.updateAppointFromCalendar(appointments);
       }
@@ -194,7 +205,7 @@ export default class Planner extends Component {
   /**add for school schedule later */
   isONAnOffDay(date, editSchedule, period, resultList) {
     let helpReturn = this.isONAnOffDayHelper(date, editSchedule, period, resultList);
-    if (!this.hasNumber(period)) {
+    if (!hasNumber(period)) {
       return  helpReturn || this.isOnOffDayOnSMCHS(date);
     } else {
       return helpReturn ||this.isOnOffDayOnSMCHS(date, Number(period.slice(-1)));
@@ -246,44 +257,6 @@ export default class Planner extends Component {
     return true;
   }
 
-  hasNumber(myString) {
-    return /\d/.test(myString);
-  }
-
-  getDuration(appoint) {
-    let startDateNum = new Date(appoint.startDate).getDate();
-    let endDateNum = new Date(appoint.endDate).getDate();
-
-    return endDateNum - startDateNum;
-  }
-
-  getAddDayList(appoint) {
-    let duration = this.getDuration(appoint);
-    let startDate = new Date(appoint.startDate);
-    
-    if (duration !== 0) {
-      let newDate = startDate;
-
-      appoint.startDate = startDate;
-      appoint.endDate = appoint.startDate;
-      let result = [Object.assign({}, addDefaultTime(appoint))];
-      for (let i = 0; i < duration; i++) {
-        newDate = getNextDay(newDate);
-        appoint.startDate = newDate;
-        appoint.endDate = newDate;
-
-        let clone = Object.assign({}, addDefaultTime(appoint));
-        result.push(clone);
-      }
-      return result;
-    }
-
-    appoint.startDate = startDate;
-    appoint.endDate = startDate;
-
-    return [addDefaultTime(appoint)];
-  }
-
   updateAppointmentsToMongo(appointIn) {
     let appoint = addId(appointIn);
     const user = {
@@ -332,7 +305,7 @@ export default class Planner extends Component {
     let finalArray;
     
     if(type === "add") {
-      const dayList = this.getAddDayList(appoint);
+      const dayList = getAddDayList(appoint);
       const isAutoAjd = dayList[0].isAutoAdjust;
 
       for (let ele of dayList) {
@@ -340,7 +313,7 @@ export default class Planner extends Component {
       }
       finalArray = this.sortPossibleAdjust(copy, isAutoAjd);
     } else if (type === "edit"){
-      const dayList = this.getAddDayList(appoint);
+      const dayList = getAddDayList(appoint);
       const isAutoAjd = dayList[0].isAutoAdjust;
       copy.splice(index, 1);
 
@@ -383,7 +356,7 @@ export default class Planner extends Component {
       }
       return 0;
     });
-    console.log(finalArray);
+    //console.log(finalArray);
     this.updateAppointmentsToMongo(finalArray);
   }
 

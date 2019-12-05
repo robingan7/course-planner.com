@@ -1,5 +1,5 @@
-export const DEFAULT_STARTTIME = "00:00";
-export const DEFAULT_ENDTIME = "00:01";
+export const DEFAULT_STARTTIME = "04:00";
+export const DEFAULT_ENDTIME = "04:01";
 export const baseUrl = "";
 
 export const getCurrentDate = d => {
@@ -19,6 +19,95 @@ export const getNextDay = d => {
     nextDay.setDate(d.getDate() + 1);
 
     return nextDay;
+}
+
+export const hasNumber = (myString) => {
+    return /\d/.test(myString);
+}
+
+export const getDuration = (appoint) => {
+    let startDateNum = new Date(appoint.startDate).getDate();
+    let endDateNum = new Date(appoint.endDate).getDate();
+
+    return endDateNum - startDateNum;
+}
+
+export const getAddDayList = (appoint) => {
+    let duration = getDuration(appoint);
+    let startDate = new Date(appoint.startDate);
+    
+    if (duration !== 0) {
+      let newDate = startDate;
+
+      appoint.startDate = startDate;
+      appoint.endDate = appoint.startDate;
+      let result = [Object.assign({}, addDefaultTime(appoint))];
+      for (let i = 0; i < duration; i++) {
+        newDate = getNextDay(newDate);
+        appoint.startDate = newDate;
+        appoint.endDate = newDate;
+
+        let clone = Object.assign({}, addDefaultTime(appoint));
+        result.push(clone);
+      }
+      return result;
+    }
+
+    appoint.startDate = startDate;
+    appoint.endDate = startDate;
+
+    return [addDefaultTime(appoint)];
+}
+
+export const fixedDateFromCalendar = (appoint, appointsIn) => {
+    for (let key in appoint) {
+        let changed = appointsIn[key];
+        let oldEndDate = appoint[key].endDate;
+        if(oldEndDate === undefined) {
+            oldEndDate = changed.endDate;
+        }
+        let newStart;
+
+        if (appoint[key].startDate === undefined) {
+          newStart = changed.startDate;
+        } else {
+          newStart = getCurrentDate(appoint[key].startDate) + "T" + DEFAULT_STARTTIME;
+        }
+        let prev = getPrevDay(oldEndDate, newStart); //date obj
+        let newEnd = getCurrentDate(prev) + "T" + DEFAULT_ENDTIME;
+        
+        appoint[key].endDate = newEnd;
+        appoint[key].startDate = newStart;
+        break;
+    }
+    return appoint;
+};
+
+export const commitChangedFromCalendar = (appoint, appointsIn) => {
+    let appoints = appointsIn.slice();
+    let index = 0;
+    let changeDates = {};
+    for (let key in fixedDateFromCalendar(appoint, appointsIn)) {
+      index = key;
+      changeDates = appoint[key];
+      break;
+    }
+    let changedElement = appoints[index];
+
+    for (let key in changeDates) {
+        changedElement[key] = changeDates[key];
+    }
+
+    let dayList = getAddDayList(changedElement);
+    for(let i = 0; i < dayList.length; i++) {
+        let currentEle = dayList[i];
+        if(i === 0) {
+            appoints[index] = currentEle;
+        } else {
+            appoints.push(currentEle);
+        }
+    }
+    return appoints;
 }
 
 export const addDefaultTime = appoint => {
@@ -71,3 +160,14 @@ export const addId = arr => {
     }
     return copy;
 }
+
+const getPrevDay = (d, start) => {
+    let dateNum = new Date(start).getDate();
+    let nextDay = new Date(d);
+    let getDate = nextDay.getDate();
+    if (dateNum <= getDate) {
+        return nextDay;
+    }
+    nextDay.setDate(getDate - 1);
+    return nextDay;
+};
