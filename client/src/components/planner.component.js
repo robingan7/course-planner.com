@@ -115,8 +115,13 @@ export default class Planner extends Component {
             { ...changedAppointment, id: startingAddedId, ...changed[changedAppointment.id] },
           ];
         } else {
+          appointments = appointments.map(appointment =>
+            changed[appointment.id]
+              ? { ...appointment, ...changed[appointment.id] }
+              : appointment
+          );
           try{
-            appointments = commitChangedFromCalendar(changed, appointments);
+            //appointments = commitChangedFromCalendar(changed, appointments);
           }catch(err) {
             console.log(err);
           }
