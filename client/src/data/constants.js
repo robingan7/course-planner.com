@@ -98,6 +98,7 @@ export const commitChangedFromCalendar = (appoint, appointsIn) => {
         changedElement[key] = changeDates[key];
     }
 
+
     let dayList = getAddDayList(changedElement);
     for(let i = 0; i < dayList.length; i++) {
         let currentEle = dayList[i];
@@ -165,7 +166,7 @@ const getPrevDay = (d, start) => {
     let dateNum = new Date(start).getDate();
     let nextDay = new Date(d);
     let getDate = nextDay.getDate();
-    if (dateNum <= getDate) {
+    if (dateNum >= getDate) {
         return nextDay;
     }
     nextDay.setDate(getDate - 1);
