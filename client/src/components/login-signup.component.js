@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import axios from "axios";
 import GoogleLogin from "react-google-login";
 import Cookies from "universal-cookie";
-
+import auth from "./auth";
+import { baseUrl } from "../data/constants";
 const cookies = new Cookies();
+
 export default class LoginSignup extends Component {
     constructor(props) {
       super(props);
@@ -26,10 +28,6 @@ export default class LoginSignup extends Component {
         signInBtnText: "sign in",
         signUpBtnText: "sign up"
       };
-
-      if (this.props.currentLogin.id !== undefined) {
-        window.location = "/planner";
-      }
     }
 
     onChangeForm(e) {
@@ -48,7 +46,7 @@ export default class LoginSignup extends Component {
 
       axios
         .post(
-          this.props.serverLink + "/signup-login/login" + googlePostfix,
+          baseUrl + "/signup-login/login" + googlePostfix,
           user
         )
         .then(res => {
@@ -96,7 +94,7 @@ export default class LoginSignup extends Component {
       }
 
       axios
-        .post(this.props.serverLink + "/signup-login/signup" + googlePostfix, user)
+        .post(baseUrl + "/signup-login/signup" + googlePostfix, user)
         .then(res => {
           let message = res.data.message;
           if (message != "Sign up successfully!!") {
@@ -168,11 +166,20 @@ export default class LoginSignup extends Component {
     }
 
     redirectToPlanner(input_user) {
-      this.props.setCurrentLogin(input_user);
       for (let [key, value] of Object.entries(input_user)) {
-          cookies.set("cp_" + key, value);
+          cookies.set("cp_" + key, value, {path: "/"});
       }
-      window.location = "/planner";
+      auth.login(() => {
+         this.props.history.push("/planner");
+      });
+    }
+
+    componentDidMount() {
+      if(cookies.get("cp__id") !== undefined) {
+        auth.login(() => {
+          this.props.history.push("/planner");
+        });
+      }
     }
 
     render() {

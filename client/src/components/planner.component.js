@@ -2,17 +2,16 @@ import React, { Component } from "react";
 import axios from "axios";
 import { Redirect } from "react-router";
 import Cookies from "universal-cookie";
+import auth from "./auth";
 import "../Planner.css";
-import Calendar from "./planner/calendar.component";
 import Settings from "./planner/settings.component";
 import Manage from "./planner/manage.component";
 import Question from "./planner/question.component";
 import Notification from "./planner/notification.component";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import { BLOCKS, MAX_NUM_OF_CLASSES} from "../data/schedules/smchs";
 import Toast from "./planner/toast.component";
 import SwitchMaterial from "@material-ui/core/Switch";
-
 import {
   DEFAULT_STARTTIME,
   getCurrentDate,
@@ -24,7 +23,8 @@ import {
   hasNumber,
   getAddDayList,
   commitChangedFromCalendar,
-  SHIFT_KEY
+  SHIFT_KEY,
+  baseUrl
 } from "../data/constants";
 import Paper from "@material-ui/core/Paper";
 import {
@@ -80,7 +80,7 @@ export default class Planner extends Component {
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
     this.setCalStyle = this.setCalStyle.bind(this);
-    this._isMounted = false;
+    this.getUserInfo = this.getUserInfo.bind(this);
     this.state = {
       isChecked: false,
       id: "",
@@ -316,7 +316,7 @@ export default class Planner extends Component {
     };
 
     axios
-      .post(this.props.serverLink + "/signup-login/update", user)
+      .post(baseUrl + "/signup-login/update", user)
       .then(res => {
         const updated = JSON.parse(res.data.info.schedule);
         this.setState({ appointments: updated});
@@ -422,7 +422,7 @@ export default class Planner extends Component {
     };
 
     axios
-      .post(this.props.serverLink + "/signup-login/update", user)
+      .post(baseUrl + "/signup-login/update", user)
       .then(res => {
         this.controlToast(true);
         const updated = {
@@ -450,7 +450,7 @@ export default class Planner extends Component {
      id: idInput
    };
     axios
-      .post(this.props.serverLink + "/signup-login/getAppointment", user)
+      .post(baseUrl + "/signup-login/getAppointment", user)
       .then(res => {
         if (res.data.message === "Got it!") {
           this.setState({
@@ -458,6 +458,9 @@ export default class Planner extends Component {
             resources: res.data.resources,
             blocks: res.data.blocks,
             textbooks: res.data.textbooks
+          });
+          auth.login(() => {
+            //this.props.history.push("/planner");
           });
         }
       })
@@ -481,97 +484,73 @@ export default class Planner extends Component {
       let allCookies = cookies.getAll();
       for (let key in allCookies) {
         if (key.indexOf("cp_") !== -1) {
-          cookies.remove(key);
+          cookies.remove(key, {path: "/"});
         }
       }
-
-      this.props.setCurrentLogin({});
       resolve();
     });
 
     promise.then(res => {
-      setTimeout(() => {
-        window.location = "/";
-      }, 100);
+      auth.logout(() => {
+        this.props.history.push("/");
+      });
     });
   }
 
+  getUserInfo() {
+    let allCookies = cookies.getAll();
+    let currentUser = {
+      id: allCookies.cp__id,
+      email: allCookies.cp_email,
+      type: allCookies.cp_loginType,
+      name: allCookies.cp_username,
+      imageUrl: "/logo192.png"
+    };
+
+    this.setState({
+      id: allCookies.cp__id,
+      email: allCookies.cp_email,
+      type: allCookies.cp_loginType,
+      name: allCookies.cp_username,
+      imageUrl: "/logo192.png"
+    });
+
+    if (allCookies.cp_loginType === "google") {
+      this.setState({
+        googleId: allCookies.cp_googleId,
+        canEditEmail: false,
+        imageUrl: allCookies.cp_imageUrl
+      });
+      currentUser.googleId = allCookies.cp_googleId;
+      currentUser.imageUrl = allCookies.cp_imageUrl;
+    } else {
+      this.setState({
+        googleId: "",
+        canEditEmail: true
+      });
+      currentUser.googleId = "";
+    }
+    this.getAppointment(currentUser.id);
+  }
+
   componentDidMount() {
-    this._isMounted = true;
     window.addEventListener("keydown", this.onKeyDown);
     window.addEventListener("keyup", this.onKeyUp);
-    if (this._isMounted){
-      const { currentLogin, setCurrentLogin} = this.props;
-      if (currentLogin.id === undefined) {
-        let cp_id = cookies.get("cp__id");
-        let cp_email = cookies.get("cp_email");
-        if (cp_id === undefined || cp_email === undefined) {
-          setCurrentLogin({});
-          this.signout();
-        } else {
-          let allCookies = cookies.getAll();
-          let currentUser = {
-            id: allCookies.cp__id,
-            email: allCookies.cp_email,
-            type: allCookies.cp_loginType,
-            name: allCookies.cp_username,
-            imageUrl: "/logo192.png"
-          };
 
-          this.setState({
-            id: allCookies.cp__id,
-            email: allCookies.cp_email,
-            type: allCookies.cp_loginType,
-            name: allCookies.cp_username,
-            imageUrl: "/logo192.png"
-          });
-
-          if (allCookies.cp_loginType === "google") {
-            this.setState({
-              googleId: allCookies.cp_googleId,
-              canEditEmail: false,
-              imageUrl: allCookies.cp_imageUrl
-            });
-            currentUser.googleId = allCookies.cp_googleId;
-            currentUser.imageUrl = allCookies.cp_imageUrl;
-          } else {
-            this.setState({
-              googleId: "",
-              canEditEmail: true
-            });
-            currentUser.googleId = "";
-          }
-          this.getAppointment(currentUser.id);
-          //setCurrentLogin(currentUser);
-        }
+    let cp_id = cookies.get("cp__id");
+    if (cp_id === undefined) {
+      let cp_email = cookies.get("cp_email");
+      if (cp_id === undefined || cp_email === undefined) {
+        this.signout();
       } else {
-        this.setState({
-          id: currentLogin.id,
-          email: currentLogin.email,
-          type: currentLogin.loginType,
-          name: currentLogin.username,
-          imageUrl: "/logo192.png"
-        });
-
-        if (currentLogin.loginType === "google") {
-          this.setState({
-            googleId: currentLogin.googleId,
-            canEditEmail: false,
-            imageUrl: currentLogin.imageUrl
-          });
-        } else {
-          this.setState({
-            googleId: "",
-            canEditEmail: true
-          });
-        }
-        this.getAppointment(currentLogin.id);
+        this.getUserInfo();
       }
+    } else {
+      this.getUserInfo();
     }
   }
 
   componentWillUnmount() {
-    this._isMounted = false;
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
   }
@@ -768,7 +747,7 @@ export default class Planner extends Component {
                 email={email}
                 canEditEmail={canEditEmail}
                 id={id}
-                serverLink={this.props.serverLink}
+                serverLink={baseUrl}
                 sendUpdate={this.onUpdateFromSettings}
               />
             )}
@@ -802,18 +781,3 @@ export default class Planner extends Component {
     );
   }
 }
-
-/*
-<Calendar
-  appointments={appointments}
-  defaultCurrentDate={currentDate}
-  currentViewName={currentViewName}
-  resources={resources}
-  viewChange={this.currentViewNameChange}
-  mainResourceName={mainResourceName}
-  setIsShiftPressed={this.setIsShiftPressed}
-  commitChangesFromCalendar={this.commitChangesFromCalendar}
-  autoAdjustCalendar={autoAdjustCalendar}
-  setAutoAdjustCalendar={this.setAutoAdjustCalendar}
-/>
- */
