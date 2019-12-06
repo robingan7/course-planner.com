@@ -578,13 +578,20 @@ export default class Planner extends Component {
   }
 
   onKeyDown(event) {
-    if (event.keyCode === SHIFT_KEY) {
+    let location = window.location.pathname;
+    
+    if (event.keyCode === SHIFT_KEY &&
+      (location === "/planner" || location === "/planner/dashboard")
+    ) {
       this.setIsShiftPressed(true);
     }
   }
 
   onKeyUp(event) {
-    if (event.keyCode === SHIFT_KEY) {
+    let location = window.location.pathname;
+
+    if (event.keyCode === SHIFT_KEY &&
+      (location === "/planner" || location === "/planner/dashboard")) {
       this.setIsShiftPressed(false);
     }
   }
