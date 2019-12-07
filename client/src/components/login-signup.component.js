@@ -17,6 +17,8 @@ export default class LoginSignup extends Component {
       this.responseGoogleSignup = this.responseGoogleSignup.bind(this);
       this.responseGoogleLogin = this.responseGoogleLogin.bind(this);
       this.redirectToPlanner = this.redirectToPlanner.bind(this);
+      this.panelControlAdd = this.panelControlAdd.bind(this);
+      this.panelControlClose = this.panelControlClose.bind(this);
       this.state = {
         usernameSignup: "",
         emailSignup: "",
@@ -26,8 +28,17 @@ export default class LoginSignup extends Component {
         loginError: "",
         signupError: "",
         signInBtnText: "sign in",
-        signUpBtnText: "sign up"
+        signUpBtnText: "sign up",
+        containerClassName: "container"
       };
+    }
+
+    panelControlClose() {
+        this.setState({ containerClassName: "container" });
+    }
+
+    panelControlAdd() {
+      this.setState({ containerClassName: "container right-panel-active" });
     }
 
     onChangeForm(e) {
@@ -183,105 +194,119 @@ export default class LoginSignup extends Component {
     }
 
     render() {
-        return (
-          <div className="App">
-            <img src="/logo512.png" alt="logo" className="titleImage" />
-            <div className="container" id="container">
-              <div className="form-container sign-up-container">
-                <form onSubmit={this.onSignup}>
-                  <h1>Create Account</h1>
-                  <div className="social-container">
-                    <GoogleLogin
-                      clientId="301626662504-9hvlkq8e1nkf4er84avjvv0ehvkifggo.apps.googleusercontent.com"
-                      buttonText="Signup with Google"
-                      onSuccess={this.responseGoogleSignup}
-                      onFailure={this.responseGoogleSignup}
-                      className="googleAuth"
-                    />
-                  </div>
-                  <span>or use your email for registration</span>
-                  <input
-                    type="text"
-                    placeholder="Username"
-                    name="usernameSignup"
-                    value={this.state.usernameSignup}
-                    onChange={this.onChangeForm}
+      const {containerClassName} = this.state;
+
+      return (
+        <div className="App">
+          <img src="/logo512.png" alt="logo" className="titleImage" />
+          <div className={containerClassName} id="container">
+            <div className="form-container sign-up-container">
+              <form onSubmit={this.onSignup}>
+                <h1>Create Account</h1>
+                <div className="social-container">
+                  <GoogleLogin
+                    clientId="301626662504-9hvlkq8e1nkf4er84avjvv0ehvkifggo.apps.googleusercontent.com"
+                    buttonText="Signup with Google"
+                    onSuccess={this.responseGoogleSignup}
+                    onFailure={this.responseGoogleSignup}
+                    className="googleAuth"
                   />
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    name="emailSignup"
-                    value={this.state.emailSignup}
-                    onChange={this.onChangeForm}
+                </div>
+                <span>or use your email for registration</span>
+                <input
+                  type="text"
+                  placeholder="Username"
+                  name="usernameSignup"
+                  value={this.state.usernameSignup}
+                  onChange={this.onChangeForm}
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  name="emailSignup"
+                  value={this.state.emailSignup}
+                  onChange={this.onChangeForm}
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  name="passwordSignup"
+                  value={this.state.passwordSignup}
+                  onChange={this.onChangeForm}
+                />
+                <button>{this.state.signUpBtnText}</button>
+                <div id="signupError">{this.state.signupError}</div>
+              </form>
+            </div>
+            <div className="form-container sign-in-container">
+              <form onSubmit={this.onLogin}>
+                <h1>Sign in</h1>
+                <div className="social-container">
+                  <GoogleLogin
+                    clientId="301626662504-9hvlkq8e1nkf4er84avjvv0ehvkifggo.apps.googleusercontent.com"
+                    buttonText="Login with Google"
+                    onSuccess={this.responseGoogleLogin}
+                    onFailure={this.responseGoogleLogin}
+                    className="googleAuth"
                   />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    name="passwordSignup"
-                    value={this.state.passwordSignup}
-                    onChange={this.onChangeForm}
-                  />
-                  <button>{this.state.signUpBtnText}</button>
-                  <div id="signupError">{this.state.signupError}</div>
-                </form>
-              </div>
-              <div className="form-container sign-in-container">
-                <form onSubmit={this.onLogin}>
-                  <h1>Sign in</h1>
-                  <div className="social-container">
-                    <GoogleLogin
-                      clientId="301626662504-9hvlkq8e1nkf4er84avjvv0ehvkifggo.apps.googleusercontent.com"
-                      buttonText="Login with Google"
-                      onSuccess={this.responseGoogleLogin}
-                      onFailure={this.responseGoogleLogin}
-                      className="googleAuth"
-                    />
-                  </div>
-                  <span>or use your account</span>
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    name="emailLogin"
-                    value={this.state.emailLogin}
-                    onChange={this.onChangeForm}
-                  />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    name="passwordLogin"
-                    value={this.state.passwordLogin}
-                    onChange={this.onChangeForm}
-                  />
-                  <a className="forgetpassword" href="mailto:gzt11111@gmail.com?subject=Recover password for {your email}&body=Thanks">
-                    Forgot your password?
-                  </a>
-                  <button>{this.state.signInBtnText}</button>
-                  <div id="loginError">{this.state.loginError}</div>
-                </form>
-              </div>
-              <div className="overlay-container">
-                <div className="overlay">
-                  <div className="overlay-panel overlay-left">
-                    <h1>Welcome Back!</h1>
-                    <p>
-                      To keep connected with us please login with your personal
-                      info
-                    </p>
-                    <button id="signInBtn" className="ghost" id="signIn">
-                      Sign In
-                    </button>
-                  </div>
-                  <div className="overlay-panel overlay-right">
-                    <h1>Course Planner!!</h1>
-                    <p>hello! we can help you organize your classes</p>
-                    <button className="ghost" id="signUp">
-                      Sign Up
-                    </button>
-                  </div>
+                </div>
+                <span>or use your account</span>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  name="emailLogin"
+                  value={this.state.emailLogin}
+                  onChange={this.onChangeForm}
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  name="passwordLogin"
+                  value={this.state.passwordLogin}
+                  onChange={this.onChangeForm}
+                />
+                <a
+                  className="forgetpassword"
+                  href="mailto:gzt11111@gmail.com?subject=Recover password for {your email}&body=Thanks"
+                >
+                  Forgot your password?
+                </a>
+                <button>{this.state.signInBtnText}</button>
+                <div id="loginError">{this.state.loginError}</div>
+              </form>
+            </div>
+            <div className="overlay-container">
+              <div className="overlay">
+                <div className="overlay-panel overlay-left">
+                  <h1>Welcome Back!</h1>
+                  <p>
+                    To keep connected with us please login with your personal
+                    info
+                  </p>
+                  <button
+                    id="signInBtn"
+                    className="ghost"
+                    id="signIn"
+                    onClick={this.panelControlClose}
+                  >
+                    Sign In
+                  </button>
+                </div>
+                <div className="overlay-panel overlay-right">
+                  <h1>Course Planner!!</h1>
+                  <p>hello! we can help you organize your classes</p>
+                  <button
+                    className="ghost"
+                    id="signUp"
+                    onClick={this.panelControlAdd}
+                  >
+                    Sign Up
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        );
+        </div>
+      );
     }
 }
