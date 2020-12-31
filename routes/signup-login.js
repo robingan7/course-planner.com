@@ -62,7 +62,7 @@ router.route("/login").post(async (req, res) => {
     try {
       var user = await Signup.findOne({ email: req.body.email, loginType: "normal"}).exec();
       if (!user) {
-        return res.send({ message: "The email does not exist" });
+        return res.send({ message: "Welcome, please sign up" });
       }
       if (!Bcrypt.compareSync(req.body.password, user.password)) {
         return res.send({ message: "The password is invalid" });
@@ -80,7 +80,7 @@ router.route("/login-google").post(async (req, res) => {
   try {
     var user = await Signup.findOne({ email: req.body.email, loginType: "google"}).exec();
     if (!user) {
-      return res.send({ message: "The email does not exist" });
+      return res.send({ message: "Welcome, please sign up" });
     } else {
       return res.send({ message: "The username and password combination is correct!", info: user});
     }
