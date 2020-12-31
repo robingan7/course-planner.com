@@ -65,7 +65,7 @@ router.route("/login").post(async (req, res) => {
         return res.send({ message: "Welcome, please sign up" });
       }
       if (!Bcrypt.compareSync(req.body.password, user.password)) {
-        return res.send({ message: "The password is invalid" });
+        return res.send({ message: "The password is incorrect" });
       }
       res.send({
         message: "The username and password combination is correct!",
