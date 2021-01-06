@@ -9,7 +9,7 @@
     "@ishawnwang/withunmounted": "^1.0.1",
     "@material-ui/core": "^4.6.1",
     "@material-ui/icons": "^4.5.1",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "material-table": "^1.54.1",
     "react": "^16.12.0",
